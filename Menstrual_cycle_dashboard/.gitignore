@@ -1,0 +1,44 @@
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Data files you don't need
+*.xlsx
+*.xls
+*.zip
+*.rar
+*.pkl
+*.pickle
+
+# Logs
+*.log
+
+# Ignore everything except what we need
+*
+
+# But DO include these files
+!structure.py
+!FedCycleData071012 (2) (1).csv
+!hormones_and_selfreport.csv
+!requirements.txt
+!.gitignore
+!.streamlit/
+!.streamlit/config.toml
