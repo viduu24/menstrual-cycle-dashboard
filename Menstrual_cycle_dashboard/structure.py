@@ -1,4 +1,5 @@
 import streamlit as st
+import os
 import pandas as pd
 #import plotly.express as px
 import seaborn as sns
@@ -8,8 +9,13 @@ import altair as alt
 # --- Load cleaned data ---
 @st.cache_data
 def load_data():
-    period_1 = pd.read_csv("data_imputed.csv")
-    period_2 = pd.read_csv("final_df.csv")
+    base_path = os.path.dirname(__file__)
+    data_path = os.path.join(base_path, "data_imputed.csv")
+    period_1 = pd.read_csv(data_path)
+    
+    final_path = os.path.join(base_path, "final_df.csv")
+    period_2 = pd.read_csv(final_path)
+    
     return period_1, period_2
     
 period_1, period_2 = load_data()
