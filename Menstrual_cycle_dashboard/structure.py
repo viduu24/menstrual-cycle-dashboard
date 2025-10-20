@@ -11,11 +11,11 @@ import altair as alt
 def load_data():
     base_path = os.path.dirname(__file__)
     data_path = os.path.join(base_path, "data_imputed.csv")
-    period_1 = pd.read_csv(data_path)
-    
     final_path = os.path.join(base_path, "final_df.csv")
+
+    period_1 = pd.read_csv(data_path)
     period_2 = pd.read_csv(final_path)
-    
+
     return period_1, period_2
     
 period_1, period_2 = load_data()
