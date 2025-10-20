@@ -8,10 +8,10 @@ import altair as alt
 # --- Load cleaned data ---
 @st.cache_data
 def load_data():
-    period_1 = pd.read_csv("data_imputed.csv")
-    period_2 = pd.read_csv("final_df.csv")
+    period_1 = pd.read_csv("../data_imputed.csv")
+    period_2 = pd.read_csv("../final_df.csv")
     return period_1, period_2
-
+    
 period_1, period_2 = load_data()
 
 def decode_phase(phase_encoded):
