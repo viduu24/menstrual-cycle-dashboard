@@ -91,9 +91,7 @@ elif page == "Data Description":
     else:
         st.write("No categorical columns found in this dataset.")
 
-    # --- Missing values ---
-    st.subheader(" Missing Values Summary")
-    st.write(df.isnull().sum())
+   
 # --- Page 3: Missingness ---
 elif page=="Missingness":
     dataset = st.selectbox("Select a dataset to view:", ["Period 1", "Period 2"])
