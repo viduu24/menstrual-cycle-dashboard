@@ -98,9 +98,10 @@ elif page == "Data Description":
 elif page=="Missingness":
     dataset = st.selectbox("Select a dataset to view:", ["Period 1", "Period 2"])
     if dataset =="Period 1":
-        st.subheader("📊 Missing Values Imputation Graph")
-        img = Image.open("missing_values_heatmap.png")
-        st.image(img, caption="Missing Values Heatmap (Period 1)", use_container_width=True)
+        base_path = os.path.dirname(__file__)
+        img_path = os.path.join(base_path, "missing_values_heatmap.png")
+        img = Image.open(img_path)
+        st.image(img, caption="Missing Values Heatmap", use_column_width=True)
     else:
         st.subheader("📊 Missing Values Imputation Graph")
         img = Image.open("missing_values_heatmap1.png")
@@ -135,7 +136,7 @@ This is a **multi-stage hybrid imputation pipeline** for menstrual cycle data wi
   - Clips extreme outliers (1st-99th percentile)
 
 ### Step 3: Advanced Imputation for Remaining Variables
-- **Method**: MICE or KNN (default: MICE)
+- **Method**: MICE 
 - **Scope**: Any columns still missing after group imputation (excluding Weight)
 - **Result**: BMI recalculated from imputed Weight/Height
 
