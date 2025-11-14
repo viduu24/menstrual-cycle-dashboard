@@ -103,9 +103,10 @@ elif page=="Missingness":
         img = Image.open(img_path)
         st.image(img, caption="Missing Values Heatmap", use_column_width=True)
     else:
-        st.subheader("📊 Missing Values Imputation Graph")
-        img = Image.open("missing_values_heatmap1.png")
-        st.image(img, caption="Missing Values Heatmap (Period 2)", use_container_width=True)
+        base_path = os.path.dirname(__file__)
+        img_path = os.path.join(base_path, "missing_values_heatmap1.png")
+        img = Image.open(img_path)
+        st.image(img, caption="Missing Values Heatmap", use_column_width=True)
         
      
 # --- Page 4: Cleaning Process ---
