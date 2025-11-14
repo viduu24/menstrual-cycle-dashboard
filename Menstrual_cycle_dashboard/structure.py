@@ -6,6 +6,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
 import altair as alt
+from PIL import Image
 # --- Load cleaned data ---
 @st.cache_data
 def load_data():
@@ -26,7 +27,7 @@ def decode_phase(phase_encoded):
 
 # --- Sidebar Navigation ---
 st.sidebar.title("🩸 Menstrual Cycle Dashboard")
-page = st.sidebar.radio("Go to", ["README", "Data Description", "Cleaning Process", "Information","Graphs"])
+page = st.sidebar.radio("Go to", ["README", "Data Description", "Missingness","Cleaning Process", "Information","Graphs"])
 
 # --- Page 1: README ---
 if page == "README":
@@ -48,32 +49,65 @@ elif page == "Data Description":
     st.header("📄 Dataset Overview")
     dataset = st.selectbox("Select a dataset to view:", ["Period 1", "Period 2"])
     df = period_1 if dataset == "Period 1" else period_2
+
     st.write("Shape:", df.shape)
     st.dataframe(df.head())
-     # --- Add explanatory text below the dataframe ---
+
+    # --- Add explanatory text ---
     if dataset == "Period 1":
         st.markdown("""
         **About Period 1 Dataset:**  
-        - Obtained from kaggle
+        - Obtained from Kaggle  
         - Contains detailed information about individual menstrual cycles recorded by users.  
         - Key columns include:  
-            - `ClientID`: Unique user identifier.  
-            - `LengthofCycle`: Duration of menstrual cycle (in days).
-            - `LengthofLutealPhase`: (In days)  
-            - `BleedingIntensity`: Categorical scale representing flow strength.  
+            - `ClientID`: Unique user identifier  
+            - `LengthofCycle`: Duration of cycle (days)  
+            - `LengthofLutealPhase`: Luteal phase duration (days)  
+            - `BleedingIntensity`: Categorical flow strength  
         """)
     else:
         st.markdown("""
         **About Period 2 Dataset:**  
-        - Obtained from PhysioNet
-        - This dataset extends the first one with additional contextual factors like stress levels, sleep duration, and nutrition.  
+        - Obtained from PhysioNet  
+        - Includes contextual lifestyle factors.  
         - Key columns include:  
-            - `Exercise`
-            - `Cramps`,`Bloating`,`Indigestion`,`appetite`,`moodswings`,`appetite`,`fatigue`  
-            - `StressLevel`, `SleepQuality`: Lifestyle indicators.
+            - `Exercise`  
+            - `Cramps`, `Bloating`, `Indigestion`, `Appetite`, `MoodSwings`, `Fatigue`  
+            - `StressLevel`, `SleepQuality`  
         """)
 
-# --- Page 3: Cleaning Process ---
+    # --- Statistical Summaries ---
+    st.subheader(" Statistical Summaries of Numerical Columns")
+    st.write(df.describe())
+
+    # --- Categorical summaries ---
+    st.subheader(" Categorical Feature Summary")
+    categorical_cols = df.select_dtypes(include=['object', 'category']).columns
+
+    if len(categorical_cols) > 0:
+        for col in categorical_cols:
+            st.markdown(f"**{col}**")
+            st.write(df[col].value_counts())
+    else:
+        st.write("No categorical columns found in this dataset.")
+
+    # --- Missing values ---
+    st.subheader(" Missing Values Summary")
+    st.write(df.isnull().sum())
+# --- Page 3: Missingness ---
+elif page=="Missingness":
+    dataset = st.selectbox("Select a dataset to view:", ["Period 1", "Period 2"])
+    if dataset =="Period 1":
+        st.subheader("📊 Missing Values Imputation Graph")
+        img = Image.open("missing_values_heatmap.png")
+        st.image(img, caption="Missing Values Heatmap (Period 1)", use_container_width=True)
+    else:
+        st.subheader("📊 Missing Values Imputation Graph")
+        img = Image.open("missing_values_heatmap1.png")
+        st.image(img, caption="Missing Values Heatmap (Period 2)", use_container_width=True)
+        
+     
+# --- Page 4: Cleaning Process ---
 elif page == "Cleaning Process":
     st.header("🧹 Data Cleaning Summary")
     dataset = st.selectbox("Select a dataset to view:", ["Period 1", "Period 2"])
@@ -156,20 +190,30 @@ This is a **multi-stage hybrid imputation pipeline** for menstrual cycle data wi
 ## **Correlation Analysis**
 The final plot examines the relationship between `MeanCycleLength` and `EstimatedDayofOvulation` using the fully imputed dataset, showing how these menstrual variables correlate after the imputation process.
 """)
+        
+        
+        
     else:
         st.markdown("""
         ### 1. Ordinal Encoding
-- Qualitative cycle-related variables (e.g., **phase, flow volume, cramps, fatigue, stress**) are **mapped to numeric scales**.
-- Example mappings:
-  - `phase`: Follicular → 1, Fertility → 2, Luteal → 3, Menstrual → 4  
-  - `flow_volume`: Not at all → 0, Very Heavy → 7  
-  - Symptom scales (cramps, fatigue, stress, etc.): 0–5 from "Not at all" to "Very High"
-- These encodings preserve **ordinal meaning** and allow numeric modeling.
+
+- Each variable was mapped according to its natural order or intensity. 
+- For example, the menstrual phase was encoded as: Follicular = 1, Fertility = 2, Luteal = 3, Menstrual = 4. 
+- Symptom and lifestyle variables such as appetite, exercise level, headaches, cramps, sore breasts, fatigue, sleep issues, mood swings, stress, food cravings, indigestion, and bloating were encoded using six levels:
+
+0 = “Not at all”
+1 = “Very Low” or “Very Low/Little”
+2 = “Low”
+3 = “Moderate”
+4 = “High”
+5 = “Very High”
+
+- Flow-related variables like flow volume and flow color had similar ordinal scales with more levels to capture intensity, with values increasing from the lightest or mildest category to the heaviest or most intense category. Each original column was transformed into a corresponding _encoded column, allowing for numerical analysis while preserving the inherent order of the categories.
 
 ---
 
 ### 2. Data Preparation
-- MNAR was observed.
+- MNAR was observed. It is seen that the days pdg was measured, the symptoms of the women were not stated. Perhaps the missingness is related to the method of testing pdg.
 - Each participant is identified by **`id`**.
 - Missing values in the hormone marker `pdg` are **filled with 0**.
 - Only **numeric columns** (excluding `pdg`) are selected for imputation.
@@ -207,7 +251,7 @@ The final plot examines the relationship between `MeanCycleLength` and `Estimate
 - **Ordinal variables encoded** for machine learning.  
 - **Logical consistency** and **efficiency maintained** across all steps.
         """)
-
+        
 elif page=="Information":
     st.markdown(""" ### 🌺 Understanding the Menstrual Cycle
 
