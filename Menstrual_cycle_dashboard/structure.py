@@ -107,8 +107,6 @@ elif page=="Missingness":
         img_path = os.path.join(base_path, "missing_values_heatmap1.png")
         img = Image.open(img_path)
         st.image(img, caption="Missing Values Heatmap", use_column_width=True)
-        
-     
 # --- Page 4: Cleaning Process ---
 elif page == "Cleaning Process":
     st.header("🧹 Data Cleaning Summary")
