@@ -157,17 +157,24 @@ elif page == "Data Description":
             st.plotly_chart(fig, use_container_width=True)
     
     # --- 4. Bar Charts for Categorical Columns ---
+    # --- 4. Bar Charts for Categorical Columns ---
     if len(categorical_cols) > 0:
         with st.expander("🗂 Categorical Feature Bar Charts"):
             for col in categorical_cols:
+    
+                # Prepare dataframe safely
+                counts = df[col].value_counts().reset_index()
+                counts.columns = [col, "count"]   # rename properly
+    
                 fig = px.bar(
-                    df[col].value_counts().reset_index(),
-                    x="index",
-                    y=col,
+                    counts,
+                    x=col,
+                    y="count",
                     title=f"Counts of {col}",
-                    color="index",
+                    color=col,
                     color_discrete_sequence=px.colors.qualitative.Pastel
                 )
+    
                 fig.update_layout(
                     template="simple_white",
                     xaxis_title=col,
@@ -175,7 +182,9 @@ elif page == "Data Description":
                     title_x=0.5,
                     height=400
                 )
+    
                 st.plotly_chart(fig, use_container_width=True)
+
 
 
    
