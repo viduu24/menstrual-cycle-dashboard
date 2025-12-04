@@ -614,7 +614,7 @@ def decode_phase(phase_encoded):
 
 # --- Sidebar Navigation ---
 st.sidebar.title("🩸 Menstrual Cycle Dashboard")
-page = st.sidebar.radio("Go to", ["README", "Data Description", "Missingness","Cleaning Process", "Information","Graphs", "ML models"])
+page = st.sidebar.radio("Go to", ["README", "Data Description", "Missingness","Cleaning Process", "Information","Graphs", "ML models", "Guide on using the predictions feature", "Predictions"])
 
 # --- Page 1: README ---
 if page == "README":
@@ -1463,10 +1463,129 @@ elif page == "Graphs":
         elif plot_type == "Participant Comparison":
             viz.plot_participant_comparison(save_path="merged_participants.png")
             st.image("merged_participants.png")
+elif page == "ML models":
+    import streamlit as st
+    import pandas as pd
+    
+    # -------------------------------------
+    # LOAD METRICS THAT YOU REPORTED EARLIER
+    # -------------------------------------
+    
+    # MODEL 2 — Phase Prediction (Random Forest)
+    model2_metrics = {
+        "Training Accuracy": 0.612,
+        "Macro F1-score": 0.584,
+        "Model Description": """
+    The Phase Prediction Model classifies each cycle day as 
+    **Follicular**, **Fertility**, **Luteal**, or **Menstrual**.
+    
+    It uses features from hormones, symptoms, and heart rate:
+    - Estrogen, PDG, LH  
+    - Hormone Z-scores  
+    - Hormone day-to-day changes (Δ1)  
+    - Cycle day, normalized cycle position  
+    - HR mean, HR lag-1, HR rolling 7-day  
+    - Symptoms totals  
+        """,
+        "Confusion Matrix (summary)": """
+    • Follicular and Luteal phases were predicted accurately  
+    • Fertility phase was more challenging due to small sample size  
+    • Misclassifications happen near phase boundaries  
+    """
+    }
+    
+    # MODEL 3 — Cycle Length Prediction (Regression)
+    model3_metrics = {
+        "RMSE": 3.244,
+        "MAE": 2.395,
+        "R² Score": 0.245,
+        "Model Description": """
+    The Cycle Length Prediction Model predicts menstrual cycle length 
+    using bleeding intensity, menses scores, and hormonal patterns.
+    
+    Features used:
+    - Mean bleeding intensity  
+    - Total high-flow days  
+    - Daily menses scores (Day 1–5)  
+    - Total menses score  
+    """,
+        "Interpretation": """
+    An RMSE of ~3.24 means the model is typically within **±3 days** 
+    of the true cycle length. This is reasonable because:
+    • Cycle length naturally varies 2–5 days between cycles  
+    • Hormonal recordings are noisy  
+    • Users differ widely in cycle patterns  
+    """
+    }
+    
+    
+    # -------------------------------------
+    # STREAMLIT PAGE LAYOUT
+    # -------------------------------------
+    st.title("📊 Machine Learning Models Overview")
+    st.write("""
+    This page summarizes the **two machine learning models** developed in this project:
+    1. **Phase Prediction Model** — classifies cycle phase  
+    2. **Cycle Length Prediction Model** — predicts length of menstrual cycle  
+    """)
+    
+    
+    # -------------------------------------------------------
+    # SECTION 1 — PHASE PREDICTION MODEL
+    # -------------------------------------------------------
+    st.header("🔮 Model 2: Phase Prediction (Classification)")
+    
+    with st.expander("📌 Model Description"):
+        st.markdown(model2_metrics["Model Description"])
+    
+    st.subheader("📈 Performance Metrics")
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        st.metric("Training Accuracy", f"{model2_metrics['Training Accuracy']:.3f}")
+    with col2:
+        st.metric("Macro F1-score", f"{model2_metrics['Macro F1-score']:.3f}")
+    
+    st.markdown("### 🧩 Interpretation of Results")
+    st.info("""
+    - Accuracy around **0.61** and Macro F1 of **0.58** are reasonable  
+    - Phase prediction is hard because phase boundaries overlap  
+    - Fertility phase is especially difficult to classify  
+    - Model performs best on **Luteal** and **Follicular** phases  
+    """)
+    
+    st.markdown("### 🔍 Confusion Matrix Summary")
+    st.text(model2_metrics["Confusion Matrix (summary)"])
+    
+    
+    # -------------------------------------------------------
+    # SECTION 2 — CYCLE LENGTH PREDICTION MODEL
+    # -------------------------------------------------------
+    st.header("📏 Model 3: Cycle Length Prediction (Regression)")
+    
+    with st.expander("📌 Model Description"):
+        st.markdown(model3_metrics["Model Description"])
+    
+    st.subheader("📈 Performance Metrics")
+    
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.metric("RMSE", f"{model3_metrics['RMSE']:.3f}")
+    with col2:
+        st.metric("MAE", f"{model3_metrics['MAE']:.3f}")
+    with col3:
+        st.metric("R² Score", f"{model3_metrics['R² Score']:.3f}")
+    
+    st.markdown("### 🧠 Interpretation of Results")
+    st.info(model3_metrics["Interpretation"])
+    
+    st.write("---")
+    st.success("📌 All ML models trained successfully and results documented above.")
+
    # =========================================================
 #                   📘   ML MODELS PAGE
 # =========================================================
-elif page == "ML models":
+elif page == "Predictions":
 
     st.title("🤖 Machine Learning Models")
     st.markdown("Explore predictions from your trained ML models — Phase & Cycle Length.")
