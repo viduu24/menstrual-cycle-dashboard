@@ -1473,7 +1473,8 @@ elif page == "ML models":
     
     # MODEL 2 — Phase Prediction (Random Forest)
    # MODEL 2 — Phase Prediction (XGBoost — NEW HIGH ACCURACY MODEL)
-   model2_metrics = {
+    model2_metrics = {
+        
        "Training Accuracy": 0.952,
        "Macro F1-score": 0.952,
        
