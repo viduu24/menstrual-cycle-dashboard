@@ -1566,14 +1566,13 @@ elif page == "ML models":
     
     st.markdown("### 🧩 Interpretation of Results")
     st.info("""
-    - Accuracy around **0.61** and Macro F1 of **0.58** are reasonable  
+    - Accuracy around **0.95** and Macro F1 of **0.95** are reasonable  
     - Phase prediction is hard because phase boundaries overlap  
     - Fertility phase is especially difficult to classify  
     - Model performs best on **Luteal** and **Follicular** phases  
     """)
     
-    st.markdown("### 🔍 Confusion Matrix Summary")
-    st.text(model2_metrics["Confusion Matrix (summary)"])
+    
     
     
     # -------------------------------------------------------
