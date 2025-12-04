@@ -11,8 +11,7 @@ This project builds a complete menstrual cycle analysis and prediction pipeline,
 - Daily cycle tracking data </br>
 - Kaggle per-cycle dataset </br>
 Using these inputs, the system trains three machine learning models: </br>
-Model 1 — Heart Rate Prediction (Regression) </br>
-Model 2 — Menstrual Phase Classification (Multiclass) </br>
-Model 3 — Next Cycle Length Prediction (Regression) </br>
+Model 1 — Menstrual Phase Classification (Multiclass) </br>
+Model 2 — Next Cycle Length Prediction (Regression) </br>
 This pipeline is designed to support a Streamlit menstrual health application. </br>
 
