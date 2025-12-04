@@ -1379,79 +1379,35 @@ elif page == "Graphs":
         else:
                 st.header("📊 Heart Rate + Hormone + Symptom Visualizations")    
     st.write("This dataset contains merged heart rate, hormone levels, and daily symptoms.")
+    else:
 
-    # Sidebar options
-    with st.sidebar:
-        st.subheader("🔍 Choose Visualization")
-        plot_type = st.radio(
-            "Select a visualization:",
+        df = period_3.copy()
+
+        # Create visualizer safely HERE
+        viz = MenstrualCycleVisualizer("final_merged_hr_hormones.csv")
+    
+        st.write("Select a visualization:")
+        plot_choice = st.selectbox(
+            "Pick a plot:",
             [
-                "HR by Cycle Phase",
-                "HR + Hormone Time Series",
-                "Correlation Heatmap",
-                "Heart Rate Variability (HRV)",
-                "Multi-Participant Comparison",
-                "Circadian Rhythm Patterns"
+                "HR by Phase",
+                "HR + Hormone Timeseries",
+                "Correlation Matrix",
+                "HR Variability",
+                "Participant Comparison",
+                "Circadian Patterns"
             ]
         )
-
-    # Load merged dataset & visualizer
-    df = period_3.copy()
-    viz = MenstrualCycleVisualizer("final_merged_hr_hormones.csv")
-
-    # -----------------------------------------------------------
-    # 1️⃣ Heart Rate by Cycle Phase
-    # -----------------------------------------------------------
-    if plot_type == "HR by Cycle Phase":
-        st.subheader("📌 Heart Rate Across Menstrual Phases")
-        viz.plot_hr_by_cycle_phase()
-
-    # -----------------------------------------------------------
-    # 2️⃣ HR + Hormone Time Series
-    # -----------------------------------------------------------
-    elif plot_type == "HR + Hormone Time Series":
-        st.subheader("📈 Heart Rate + Hormone Time Series")
-
-        # Let user choose participant
-        pid = st.sidebar.selectbox(
-            "Choose Participant ID",
-            sorted(df["id"].unique())
-        )
-
-        viz.plot_hr_hormone_timeseries(participant_id=pid)
-
-    # -----------------------------------------------------------
-    # 3️⃣ Correlation Heatmap
-    # -----------------------------------------------------------
-    elif plot_type == "Correlation Heatmap":
-        st.subheader("🔗 Correlation Heatmap (HR & Hormones)")
-        viz.plot_correlation_matrix()
-
-    # -----------------------------------------------------------
-    # 4️⃣ Heart Rate Variability (HRV)
-    # -----------------------------------------------------------
-    elif plot_type == "Heart Rate Variability (HRV)":
-        st.subheader("💓 Heart Rate Variability Analysis")
-        viz.plot_hrv_analysis()
-
-    # -----------------------------------------------------------
-    # 5️⃣ Multi-Participant Comparison
-    # -----------------------------------------------------------
-    elif plot_type == "Multi-Participant Comparison":
-        st.subheader("👥 HR Comparison Across Participants")
-
-        num = st.sidebar.slider(
-            "Number of participants",
-            min_value=3,
-            max_value=12,
-            value=6
-        )
-
-        viz.plot_participant_comparison(n_participants=num)
-
-    # -----------------------------------------------------------
-    # 6️⃣ Circadian Rhythm Patterns
-    # -----------------------------------------------------------
-    elif plot_type == "Circadian Rhythm Patterns":
-        st.subheader("🌙 Circadian Heart Rate Patterns")
-        viz.plot_circadian_patterns()
+    
+        if plot_choice == "HR by Phase":
+            viz.plot_hr_by_cycle_phase()
+        elif plot_choice == "HR + Hormone Timeseries":
+            viz.plot_hr_hormone_timeseries()
+        elif plot_choice == "Correlation Matrix":
+            viz.plot_correlation_matrix()
+        elif plot_choice == "HR Variability":
+            viz.plot_hrv_analysis()
+        elif plot_choice == "Participant Comparison":
+            viz.plot_participant_comparison()
+        elif plot_choice == "Circadian Patterns":
+            viz.plot_circadian_patterns()
