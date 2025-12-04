@@ -1473,30 +1473,42 @@ elif page == "ML models":
     
     # MODEL 2 — Phase Prediction (Random Forest)
    # MODEL 2 — Phase Prediction (XGBoost — NEW HIGH ACCURACY MODEL)
-    model2_metrics = {
-        "Training Accuracy": 0.952,
-        "Macro F1-score": 0.952,
-        "Model Description": """
-    This is the **XGBoost Phase Prediction Model** that classifies each day into:
-    **Follicular, Fertility, Luteal, Menstrual**.
-    
-    This model uses:
-    • Hormones: Estrogen, PDG, LH  
-    • Hormone deltas (Δ1)  
-    • Z-scores  
-    • Cycle day + normalized cycle position  
-    • Heart rate (mean, lag-1, rolling 7-day)  
-    • Symptom totals  
-    
-    
-        """,
-        "
-    Very strong phase separation:
-    • All four phases are predicted accurately  
-    • Improved Fertility phase detection  
-    • Minimal confusion between Follicular ↔ Luteal  
-    """
-    }
+   model2_metrics = {
+    "Training Accuracy": 0.952,
+    "Macro F1-score": 0.952,
+
+    "Model Description": """
+### 🧠 XGBoost Phase Prediction Model
+This model classifies each day into:
+
+**• Follicular  
+• Fertility  
+• Luteal  
+• Menstrual**
+
+It uses a rich feature set combining:
+- Estrogen, PDG, LH  
+- Hormone dynamics (Δ1 changes)
+- Z-scores  
+- Cycle day + normalized phase  
+- Heart Rate (mean, lag-1, rolling 7-day)
+- Symptom totals
+
+This improves the biological interpretability and robustness of the model.
+""",
+
+    "Model Interpretation": """
+### 📈 Model Interpretation — Why Accuracy Is High
+- The XGBoost model learns nonlinear hormone + HR patterns  
+- Fertility phase is detected more reliably than Random Forest  
+- Minimal confusion between Follicular ↔ Luteal  
+- Normalized cycle position helps align cycles of different lengths  
+
+Overall:
+**A highly stable and biologically meaningful classifier.**
+"""
+}
+
 
     # MODEL 3 — Cycle Length Prediction (Regression)
     model3_metrics = {
