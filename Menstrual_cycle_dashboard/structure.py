@@ -47,95 +47,96 @@ if page == "README":
     """)
 
 # --- Page 2: Data Description ---
-st.header("📄 Dataset Overview")
-
-# Updated selectbox including the merged dataset
-dataset = st.selectbox(
-    "Select a dataset to view:",
-    ["Period 1 (Kaggle)", "Period 2 (PhysioNet)", "Merged Dataset (Used for ML Models)"]
-)
-
-# Pick dataset
-if dataset.startswith("Period 1"):
-    df = period_1
-elif dataset.startswith("Period 2"):
-    df = period_2
-else:
-    df = period_3
-
-# Show dataset shape + head
-st.write("Shape:", df.shape)
-st.dataframe(df.head())
-
-# ---------------------- ABOUT EACH DATASET ----------------------
-if dataset.startswith("Period 1"):
-    st.markdown("""
-        ### 📘 About Period 1 (Kaggle Dataset)
-        - Per-cycle dataset with demographic and cycle characteristics  
-        - Includes columns such as:  
-        **LengthofCycle**, **Age**, **BMI**, **TotalMensesScore**, **OvulationDay**
-    """)
-
-elif dataset.startswith("Period 2"):
-    st.markdown("""
-        ### 📘 About Period 2 (PhysioNet Dataset)
-        - Daily hormone + symptoms dataset  
-        - Includes **Heart Rate**, **Cramps**, **Mood**, **Sleep**, **Bloating**, etc.  
-        - Used for time-series analysis.
-    """)
-
-else:
-    st.markdown("""
-        ### 📘 About Merged Dataset
-        - Combination of PhysioNet + Hormones + Symptoms  
-        - Used for all **Machine Learning models**  
-        - Contains engineered features such as:  
-        - **hr_rolling_7d**, **phase_lag1_enc**, **estrogen_delta1**,  
-        - **pdg_z**, **normalized_cycle_day**, etc.
-    """)
-
-# ---------------------- SUMMARY STATISTICS ----------------------
-st.subheader("📊 Statistical Summary (Numerical Columns)")
-st.write(df.describe())
-
-# ---------------------- CATEGORICAL SUMMARY ----------------------
-st.subheader("🗂 Categorical Columns Breakdown")
-categorical_cols = df.select_dtypes(include=['object', 'category']).columns
-
-if len(categorical_cols) > 0:
-    for col in categorical_cols:
-        st.markdown(f"**{col}**")
-        st.write(df[col].value_counts())
-else:
-    st.write("No categorical columns found in this dataset.")
-
-# ---------------------- INITIAL GRAPHS ----------------------
-st.subheader("📉 Initial Exploratory Visualizations")
-
-numeric_cols = df.select_dtypes(include=['int64', 'float64']).columns
-
-# 1️⃣ Distribution of All Numeric Columns
-st.markdown("### 📈 Distributions of Numeric Columns")
-for col in numeric_cols:
-    fig, ax = plt.subplots()
-    sns.histplot(df[col].dropna(), kde=True, ax=ax)
-    plt.title(f"Distribution of {col}")
-    st.pyplot(fig)
-
-# 2️⃣ Correlation Heatmap
-if len(numeric_cols) >= 3:
-    st.markdown("### 🔗 Correlation Heatmap")
-    fig, ax = plt.subplots(figsize=(10, 6))
-    sns.heatmap(df[numeric_cols].corr(), annot=False, cmap='coolwarm')
-    st.pyplot(fig)
-
-# 3️⃣ Boxplots for Numeric Columns
-st.markdown("### 📦 Boxplots for Numeric Columns")
-for col in numeric_cols:
-    fig, ax = plt.subplots()
-    sns.boxplot(x=df[col], ax=ax)
-    plt.title(f"Boxplot of {col}")
-    st.pyplot(fig)
+elif page == "Data Description"
+    st.header("📄 Dataset Overview")
+    
+    # Updated selectbox including the merged dataset
+    dataset = st.selectbox(
+        "Select a dataset to view:",
+        ["Period 1 (Kaggle)", "Period 2 (PhysioNet)", "Merged Dataset (Used for ML Models)"]
+    )
+    
+    # Pick dataset
+    if dataset.startswith("Period 1"):
+        df = period_1
+    elif dataset.startswith("Period 2"):
+        df = period_2
+    else:
+        df = period_3
+    
+    # Show dataset shape + head
+    st.write("Shape:", df.shape)
+    st.dataframe(df.head())
+    
+    # ---------------------- ABOUT EACH DATASET ----------------------
+    if dataset.startswith("Period 1"):
+        st.markdown("""
+            ### 📘 About Period 1 (Kaggle Dataset)
+            - Per-cycle dataset with demographic and cycle characteristics  
+            - Includes columns such as:  
+            **LengthofCycle**, **Age**, **BMI**, **TotalMensesScore**, **OvulationDay**
+        """)
+    
+    elif dataset.startswith("Period 2"):
+        st.markdown("""
+            ### 📘 About Period 2 (PhysioNet Dataset)
+            - Daily hormone + symptoms dataset  
+            - Includes **Heart Rate**, **Cramps**, **Mood**, **Sleep**, **Bloating**, etc.  
+            - Used for time-series analysis.
+        """)
+    
+    else:
+        st.markdown("""
+            ### 📘 About Merged Dataset
+            - Combination of PhysioNet + Hormones + Symptoms  
+            - Used for all **Machine Learning models**  
+            - Contains engineered features such as:  
+            - **hr_rolling_7d**, **phase_lag1_enc**, **estrogen_delta1**,  
+            - **pdg_z**, **normalized_cycle_day**, etc.
+        """)
+    
+    # ---------------------- SUMMARY STATISTICS ----------------------
+    st.subheader("📊 Statistical Summary (Numerical Columns)")
+    st.write(df.describe())
+    
+    # ---------------------- CATEGORICAL SUMMARY ----------------------
+    st.subheader("🗂 Categorical Columns Breakdown")
+    categorical_cols = df.select_dtypes(include=['object', 'category']).columns
+    
+    if len(categorical_cols) > 0:
+        for col in categorical_cols:
+            st.markdown(f"**{col}**")
+            st.write(df[col].value_counts())
+    else:
+        st.write("No categorical columns found in this dataset.")
+    
+    # ---------------------- INITIAL GRAPHS ----------------------
+    st.subheader("📉 Initial Exploratory Visualizations")
+    
+    numeric_cols = df.select_dtypes(include=['int64', 'float64']).columns
+    
+    # 1️⃣ Distribution of All Numeric Columns
+    st.markdown("### 📈 Distributions of Numeric Columns")
+    for col in numeric_cols:
+        fig, ax = plt.subplots()
+        sns.histplot(df[col].dropna(), kde=True, ax=ax)
+        plt.title(f"Distribution of {col}")
+        st.pyplot(fig)
+    
+    # 2️⃣ Correlation Heatmap
+    if len(numeric_cols) >= 3:
+        st.markdown("### 🔗 Correlation Heatmap")
+        fig, ax = plt.subplots(figsize=(10, 6))
+        sns.heatmap(df[numeric_cols].corr(), annot=False, cmap='coolwarm')
+        st.pyplot(fig)
+    
+    # 3️⃣ Boxplots for Numeric Columns
+    st.markdown("### 📦 Boxplots for Numeric Columns")
+    for col in numeric_cols:
+        fig, ax = plt.subplots()
+        sns.boxplot(x=df[col], ax=ax)
+        plt.title(f"Boxplot of {col}")
+        st.pyplot(fig)
 
    
 # --- Page 3: Missingness ---
