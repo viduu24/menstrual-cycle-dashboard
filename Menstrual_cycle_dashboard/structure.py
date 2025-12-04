@@ -209,8 +209,8 @@ elif page=="Missingness":
 # --- Page 4: Cleaning Process ---
 elif page == "Cleaning Process":
     st.header("🧹 Data Cleaning Summary")
-    dataset = st.selectbox("Select a dataset to view:", ["Period 1", "Period 2"])
-    if dataset == "Period 1":
+    dataset = st.selectbox("Select a dataset to view:", ["Kaggle", "Hormones+symptoms", "heart rate and hormones symptoms merged"])
+    if dataset == "Kaggle":
         
         st.markdown("""
 # Summary of the Imputation Process
@@ -292,7 +292,7 @@ The final plot examines the relationship between `MeanCycleLength` and `Estimate
         
         
         
-    else:
+    elif dataset=="Hormones+symptoms:
         st.markdown("""
         ### 1. Ordinal Encoding
 
@@ -350,6 +350,144 @@ The final plot examines the relationship between `MeanCycleLength` and `Estimate
 - **Ordinal variables encoded** for machine learning.  
 - **Logical consistency** and **efficiency maintained** across all steps.
         """)
+    else:
+        st.markdown("""
+    ## 📥 1. Heart Rate Loading Process
+
+    The raw heart rate dataset from MCPhases/Fitbit is extremely large  
+    (hundreds of thousands of rows per participant).  
+    Loading it fully would crash memory, so the process is **optimized**.
+
+    ### 🔍 **Filtering HR Before Loading**
+    Instead of loading the whole file, we load only rows that match:
+
+    - ✔ Participants present in the hormone dataset  
+    - ✔ Days that fall inside hormone dataset's date range  
+
+    This reduces HR data to **only what is needed** for merging.
+
+    ### 🧭 Steps Performed During Loading:
+    - Detect the correct HR file (`bpm`, `heart_rate`, etc.)
+    - Read it in **chunks of 100,000 rows**  
+    - Filter each chunk by:
+        - `id` (participants present)
+        - `day_in_study` (matching hormone date range)
+    - Rename `bpm` → `heart_rate`
+    - Optimize memory by converting:
+        - `float64 → float32`
+        - `int64 → uint16 / int32`
+
+    This lowers HR file size by **80–90%** before merging.
+
+    ---
+    """)
+
+    st.markdown("""
+    ## 📊 2. Aggregating Heart Rate (Daily)
+
+    The original HR dataset may have many readings per day.
+
+    We aggregate readings **per participant, per day** into:
+
+    - `hr_mean`  
+    - `hr_min`  
+    - `hr_max`  
+    - `hr_std`  
+    - `hr_count` (number of samples collected that day)
+
+    This results in a clean daily HR dataset aligned with daily hormone measurements.
+
+    Example aggregation:
+
+    ```
+    groupby(['id', 'day_in_study']).agg({
+        'heart_rate': ['mean', 'std', 'min', 'max', 'count']
+    })
+    ```
+
+    Aggregation reduces:
+    - Noise  
+    - Random fluctuations  
+    - Excessive data volume  
+
+    And prepares HR for merging with symptoms + hormone values.
+
+    ---
+    """)
+
+    st.markdown("""
+    ## 💢 3. Introducing Realistic Missingness (Simulation)
+
+    To demonstrate missing data handling, we introduce **15% simulated missingness**
+    with realistic patterns:
+
+    - Device glitches  
+    - Participant forgets to wear watch  
+    - Sensor issues at night  
+    - Random dropout  
+    - Multi-day missing blocks (device off)
+
+    Patterns include:
+    - Random missing  
+    - Participant-bias missing  
+    - Time-dependent missing (night hours)  
+    - Block missing (multiple consecutive days)
+
+    This simulates real Fitbit/MCPhases behavior.
+
+    ---
+    """)
+
+    st.markdown("""
+    ## 🔧 4. Time-Series Imputation (Advanced)
+
+    Missing HR is imputed using **a multi-step time-series algorithm**:
+
+    ### ✔ Trend estimation
+    Smooths long-term HR changes.
+
+    ### ✔ Weekly seasonality (day_in_study % 7)
+    Captures biological rhythms (sleep/wake cycles).
+
+    ### ✔ Linear interpolation
+    Fills gaps between known values.
+
+    ### ✔ Final fallback mean
+    Only used if a participant has too few HR records.
+
+    This produces **smooth, realistic HR curves** unlike simple mean imputation.
+
+    ---
+    """)
+
+    st.markdown("""
+    ## 🔗 5. Merging Heart Rate with Hormones
+
+    After cleaning HR, it is merged with the hormone/self-report dataset using:
+
+    ```
+    merge on: id + day_in_study
+    ```
+
+    ⚡ The merged dataset contains:
+    - Daily HR metrics  
+    - Daily hormone values  
+    - Symptoms  
+    - Lifestyle features  
+    - Engineered cycle-day features  
+
+    This merged file is crucial for:
+    - Heart Rate Prediction Model  
+    - Phase Prediction Model  
+    - Feature Engineering  
+    - Final ML pipeline  
+
+    Saved as:
+
+    **`final_merged_hr_hormones.csv`**
+
+    ---
+    """)
         
 elif page=="Information":
     st.markdown(""" ### 🌺 Understanding the Menstrual Cycle
