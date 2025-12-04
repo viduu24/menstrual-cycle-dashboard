@@ -1463,6 +1463,176 @@ elif page == "Graphs":
         elif plot_type == "Participant Comparison":
             viz.plot_participant_comparison(save_path="merged_participants.png")
             st.image("merged_participants.png")
+elif page == "Guide on using the predictions feature":
+    st.header("📝 Input Recommendations for Accurate Predictions")
+
+    tab1, tab2 = st.tabs(["📌 Phase Prediction Inputs", "📅 Cycle Length Prediction Inputs"])
+    
+    # ============================================================
+    # TAB 1 — PHASE PREDICTION INPUT RECOMMENDATIONS
+    # ============================================================
+    with tab1:
+        st.subheader("📌 Recommended Input Ranges — Phase Prediction")
+    
+        st.markdown("""
+    The phase prediction model uses **hormones**, **heart rate**, and **cycle day information**.
+    
+    Below are recommended ranges so users know what values to enter.
+    
+    ---
+    
+    ### 🧪 **Hormones**
+    Typical values for healthy menstrual cycles:
+    
+    | Hormone | Follicular | Fertility / Ovulation | Luteal | Notes |
+    |--------|------------|------------------------|---------|-------|
+    | **Estrogen (pg/mL)** | 30–120 | **150–350** | 50–150 | Peaks before ovulation |
+    | **PDG (ng/mL)** | < 5 | 2–10 | **10–25** | High after ovulation |
+    | **LH (mIU/mL)** | 2–10 | **20–80 (peak)** | 1–10 | Spikes during ovulation |
+    
+    ✔ Users can enter values from **lab tests**, **home hormone trackers**, or **app-estimated values**.
+    
+    ---
+    
+    ### ⏳ **Cycle Day**
+    - Range: **1–28**
+    - Enter the cycle day you are currently on.
+    - If unsure:  
+      - Day 1 = first day of period  
+      - Day ~14 = ovulation  
+      - Days 15–28 = luteal phase  
+    
+    ---
+    
+    ### ❤️ **Heart Rate Inputs**
+    These help improve accuracy but are optional.
+    
+    | Metric | Typical Range | How to Enter |
+    |--------|----------------|--------------|
+    | **Mean HR (bpm)** | 55–95 bpm | Enter daily average HR |
+    | **Lag-1 HR (bpm)** | 55–95 bpm | Yesterday's HR |
+    | **Rolling 7-day HR (bpm)** | 55–95 bpm | Average of last 7 days |
+    
+    If you don't track HR, leave blank (model handles missing values).
+    
+    ---
+    
+    ### 😣 **Symptoms (Aggregated Scores)**
+    These are calculated from your dataset:
+    
+    | Feature | Meaning | Typical Range |
+    |---------|---------|----------------|
+    | **symptom_sum** | Sum of tracked symptoms | 0–30 |
+    | **symptom_mean** | Average symptom level | 0–3 |
+    | **total_symptoms** | Encoded phase symptoms | 0–10 |
+    
+    Users do NOT need to manually enter these — the model calculates them automatically.
+    
+    ---
+    
+    ### 🎯 Recommended Input Strategy
+    For best accuracy:
+    - Use **true hormone values** if available  
+    - Provide **cycle day** accurately  
+    - Enter **heart rate** if you use a smart watch  
+    - You **do not** enter symptoms manually  
+    
+    """)
+    
+    # ============================================================
+    # TAB 2 — CYCLE LENGTH PREDICTION INPUT RECOMMENDATIONS
+    # ============================================================
+    with tab2:
+        st.subheader("📅 Recommended Input Ranges — Cycle Length Prediction")
+    
+        st.markdown("""
+    This model predicts **next cycle length** using bleeding patterns across prior cycles.
+    
+    ---
+    
+    ### 🔢 **Cycle Length (Prior Cycles)**
+    - Enter **1–3 past cycle lengths**
+    - Typical cycle length range: **24–35 days**
+    - Must be a *whole number*
+    
+    Example:
+    - Cycle 1: 28  
+    - Cycle 2: 30  
+    - Cycle 3: 27  
+    
+    ---
+    
+    ### 🩸 **Mean Menses Length**
+    Average number of days bleeding lasts.
+    
+    - Typical: **3–7 days**
+    
+    ---
+    
+    ### 🌡️ Mean Bleeding Intensity (0–3 scale)
+    Use this scale:
+    
+    | Value | Meaning |
+    |-------|---------|
+    | **0** | No bleeding |
+    | **1** | Light |
+    | **2** | Medium |
+    | **3** | Heavy |
+    
+    ---
+    
+    ### 📊 **Daily Menses Scores (Day 1–Day 10)**
+    Users enter values **0–3**:
+    
+    | Value | Meaning |
+    |-------|---------|
+    | 0 | No bleeding |
+    | 1 | Spotting / very light |
+    | 2 | Medium / normal flow |
+    | 3 | Heavy bleeding |
+    
+    You *do not* need to fill all 10 days.  
+    Most users bleed 4–7 days.
+    
+    Example entry:
+    - Day 1: 2  
+    - Day 2: 3  
+    - Day 3: 2  
+    - Day 4: 1  
+    - Days 5–10: 0  
+    
+    ---
+    
+    ### 📌 Additional Features the Model Uses (No Input Required)
+    These come from your dataset:
+    - Total menses score  
+    - Total fertility formula  
+    - CycleWithPeakOrNot  
+    
+    Users do *not* enter these manually.
+    
+    ---
+    
+    ### 🎯 Recommended Input Strategy
+    To get the most accurate cycle length prediction:
+    - Enter **at least 2 previous cycle lengths**
+    - Accurately record daily bleeding for 3–7 days  
+    - Do NOT enter unrealistic scores (e.g., 10 or -1)
+    
+    ---
+    
+    ### 🔍 Example Prediction Flow
+    User enters:
+    
+    - Cycle 1: 28  
+    - Cycle 2: 30  
+    - Mean menses length: 5  
+    - Menses scores: [2,3,2,1,0,0,0]
+    
+    The model predicts:
+    **Next cycle length ≈ 29 days**
+    """)
+
 elif page == "ML models":
     import streamlit as st
     import pandas as pd
