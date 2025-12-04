@@ -292,7 +292,7 @@ The final plot examines the relationship between `MeanCycleLength` and `Estimate
         
         
         
-    elif dataset=="Hormones+symptoms:
+    elif dataset== "Hormones+symptoms":
         st.markdown("""
         ### 1. Ordinal Encoding
 
