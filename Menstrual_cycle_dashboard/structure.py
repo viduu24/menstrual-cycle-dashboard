@@ -71,7 +71,7 @@ elif page == "Data Description":
     # ---------------------- ABOUT EACH DATASET ----------------------
     if dataset.startswith("Period 1"):
         st.markdown("""
-            ### 📘 About Period 1 (Kaggle Dataset)
+            ###  About Period 1 (Kaggle Dataset)
             - Per-cycle dataset with demographic and cycle characteristics  
             - Includes columns such as:  
             **LengthofCycle**, **Age**, **BMI**, **TotalMensesScore**, **OvulationDay**
@@ -79,7 +79,7 @@ elif page == "Data Description":
     
     elif dataset.startswith("Period 2"):
         st.markdown("""
-            ### 📘 About Period 2 (PhysioNet Dataset)
+            ###  About Period 2 (PhysioNet Dataset)
             - Daily hormone + symptoms dataset  
             - Includes **Heart Rate**, **Cramps**, **Mood**, **Sleep**, **Bloating**, etc.  
             - Used for time-series analysis.
@@ -87,7 +87,7 @@ elif page == "Data Description":
     
     else:
         st.markdown("""
-            ### 📘 About Merged Dataset
+            ###  About Merged Dataset
             - Combination of PhysioNet + Hormones + Symptoms  
             - Used for all **Machine Learning models**  
             - Contains engineered features such as:  
@@ -96,7 +96,7 @@ elif page == "Data Description":
         """)
     
     # ---------------------- SUMMARY STATISTICS ----------------------
-    st.subheader("📊 Statistical Summary (Numerical Columns)")
+    st.subheader(" Statistical Summary (Numerical Columns)")
     st.write(df.describe())
     
     # ---------------------- CATEGORICAL SUMMARY ----------------------
@@ -118,7 +118,7 @@ elif page == "Data Description":
     categorical_cols = df.select_dtypes(include=['object', 'category']).columns
     
     # --- 1. Distribution Plots ---
-    with st.expander("📈 Distribution Plots (Histogram + KDE)"):
+    with st.expander(" Distribution Plots (Histogram + KDE)"):
         for col in numeric_cols:
             fig = px.histogram(
                 df, x=col, nbins=40, marginal="box",
@@ -134,7 +134,7 @@ elif page == "Data Description":
     
     # --- 2. Correlation Heatmap ---
     if len(numeric_cols) >= 3:
-        with st.expander("🔗 Correlation Heatmap"):
+        with st.expander(" Correlation Heatmap"):
             corr = df[numeric_cols].corr()
             fig = px.imshow(
                 corr,
@@ -146,7 +146,7 @@ elif page == "Data Description":
             st.plotly_chart(fig, use_container_width=True)
     
     # --- 3. Boxplots for Distribution Spread ---
-    with st.expander("📦 Boxplots (Outlier Detection)"):
+    with st.expander(" Boxplots (Outlier Detection)"):
         for col in numeric_cols:
             fig = px.box(
                 df, y=col,
@@ -159,7 +159,7 @@ elif page == "Data Description":
     # --- 4. Bar Charts for Categorical Columns ---
     # --- 4. Bar Charts for Categorical Columns ---
     if len(categorical_cols) > 0:
-        with st.expander("🗂 Categorical Feature Bar Charts"):
+        with st.expander(" Categorical Feature Bar Charts"):
             for col in categorical_cols:
     
                 # Prepare dataframe safely
