@@ -111,32 +111,72 @@ elif page == "Data Description":
         st.write("No categorical columns found in this dataset.")
     
     # ---------------------- INITIAL GRAPHS ----------------------
-    st.subheader("📉 Initial Exploratory Visualizations")
+    # ---------------------- INITIAL EDA VISUALIZATIONS ----------------------
+    st.subheader("📊 Exploratory Visualizations")
     
     numeric_cols = df.select_dtypes(include=['int64', 'float64']).columns
+    categorical_cols = df.select_dtypes(include=['object', 'category']).columns
     
-    # 1️⃣ Distribution of All Numeric Columns
-    st.markdown("### 📈 Distributions of Numeric Columns")
-    for col in numeric_cols:
-        fig, ax = plt.subplots()
-        sns.histplot(df[col].dropna(), kde=True, ax=ax)
-        plt.title(f"Distribution of {col}")
-        st.pyplot(fig)
+    # --- 1. Distribution Plots ---
+    with st.expander("📈 Distribution Plots (Histogram + KDE)"):
+        for col in numeric_cols:
+            fig = px.histogram(
+                df, x=col, nbins=40, marginal="box",
+                title=f"Distribution of {col}",
+                color_discrete_sequence=["#5C6BC0"]
+            )
+            fig.update_layout(
+                template="simple_white",
+                title_x=0.5,
+                height=400
+            )
+            st.plotly_chart(fig, use_container_width=True)
     
-    # 2️⃣ Correlation Heatmap
+    # --- 2. Correlation Heatmap ---
     if len(numeric_cols) >= 3:
-        st.markdown("### 🔗 Correlation Heatmap")
-        fig, ax = plt.subplots(figsize=(10, 6))
-        sns.heatmap(df[numeric_cols].corr(), annot=False, cmap='coolwarm')
-        st.pyplot(fig)
+        with st.expander("🔗 Correlation Heatmap"):
+            corr = df[numeric_cols].corr()
+            fig = px.imshow(
+                corr,
+                text_auto=False,
+                color_continuous_scale="RdBu_r",
+                title="Correlation Heatmap"
+            )
+            fig.update_layout(title_x=0.5, height=600)
+            st.plotly_chart(fig, use_container_width=True)
     
-    # 3️⃣ Boxplots for Numeric Columns
-    st.markdown("### 📦 Boxplots for Numeric Columns")
-    for col in numeric_cols:
-        fig, ax = plt.subplots()
-        sns.boxplot(x=df[col], ax=ax)
-        plt.title(f"Boxplot of {col}")
-        st.pyplot(fig)
+    # --- 3. Boxplots for Distribution Spread ---
+    with st.expander("📦 Boxplots (Outlier Detection)"):
+        for col in numeric_cols:
+            fig = px.box(
+                df, y=col,
+                title=f"Boxplot of {col}",
+                color_discrete_sequence=["#AB47BC"]
+            )
+            fig.update_layout(template="simple_white", height=350)
+            st.plotly_chart(fig, use_container_width=True)
+    
+    # --- 4. Bar Charts for Categorical Columns ---
+    if len(categorical_cols) > 0:
+        with st.expander("🗂 Categorical Feature Bar Charts"):
+            for col in categorical_cols:
+                fig = px.bar(
+                    df[col].value_counts().reset_index(),
+                    x="index",
+                    y=col,
+                    title=f"Counts of {col}",
+                    color="index",
+                    color_discrete_sequence=px.colors.qualitative.Pastel
+                )
+                fig.update_layout(
+                    template="simple_white",
+                    xaxis_title=col,
+                    yaxis_title="Count",
+                    title_x=0.5,
+                    height=400
+                )
+                st.plotly_chart(fig, use_container_width=True)
+
 
    
 # --- Page 3: Missingness ---
