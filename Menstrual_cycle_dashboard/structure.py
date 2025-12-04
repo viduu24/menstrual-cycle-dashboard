@@ -1377,37 +1377,39 @@ elif page == "Graphs":
             st.altair_chart(symptoms_chart, use_container_width=True)
             st.markdown(""" During the menstrual phase, most symptoms start to or increase (especially cramps)""")
         else:
-                st.header("📊 Heart Rate + Hormone + Symptom Visualizations")    
-    st.write("This dataset contains merged heart rate, hormone levels, and daily symptoms.")
-    else:
+            
+            
+            st.header("📊 Heart Rate + Hormone + Symptom Visualizations")    
+            st.write("This dataset contains merged heart rate, hormone levels, and daily symptoms.")
+        
 
-        df = period_3.copy()
-
-        # Create visualizer safely HERE
-        viz = MenstrualCycleVisualizer("final_merged_hr_hormones.csv")
+            df = period_3.copy()
     
-        st.write("Select a visualization:")
-        plot_choice = st.selectbox(
-            "Pick a plot:",
-            [
-                "HR by Phase",
-                "HR + Hormone Timeseries",
-                "Correlation Matrix",
-                "HR Variability",
-                "Participant Comparison",
-                "Circadian Patterns"
-            ]
-        )
-    
-        if plot_choice == "HR by Phase":
-            viz.plot_hr_by_cycle_phase()
-        elif plot_choice == "HR + Hormone Timeseries":
-            viz.plot_hr_hormone_timeseries()
-        elif plot_choice == "Correlation Matrix":
-            viz.plot_correlation_matrix()
-        elif plot_choice == "HR Variability":
-            viz.plot_hrv_analysis()
-        elif plot_choice == "Participant Comparison":
-            viz.plot_participant_comparison()
-        elif plot_choice == "Circadian Patterns":
-            viz.plot_circadian_patterns()
+            # Create visualizer safely HERE
+            viz = MenstrualCycleVisualizer("final_merged_hr_hormones.csv")
+        
+            st.write("Select a visualization:")
+            plot_choice = st.selectbox(
+                "Pick a plot:",
+                [
+                    "HR by Phase",
+                    "HR + Hormone Timeseries",
+                    "Correlation Matrix",
+                    "HR Variability",
+                    "Participant Comparison",
+                    "Circadian Patterns"
+                ]
+            )
+        
+            if plot_choice == "HR by Phase":
+                viz.plot_hr_by_cycle_phase()
+            elif plot_choice == "HR + Hormone Timeseries":
+                viz.plot_hr_hormone_timeseries()
+            elif plot_choice == "Correlation Matrix":
+                viz.plot_correlation_matrix()
+            elif plot_choice == "HR Variability":
+                viz.plot_hrv_analysis()
+            elif plot_choice == "Participant Comparison":
+                viz.plot_participant_comparison()
+            elif plot_choice == "Circadian Patterns":
+                viz.plot_circadian_patterns()
