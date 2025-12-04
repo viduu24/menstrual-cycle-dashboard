@@ -1376,56 +1376,55 @@ elif page == "Graphs":
     
             st.altair_chart(symptoms_chart, use_container_width=True)
             st.markdown(""" During the menstrual phase, most symptoms start to or increase (especially cramps)""")
-        else:
-            
-            st.header("📊 Merged Dataset Visualizations")
-            df = period_3.copy()    # ← your merged dataset
-    
-            # Create visualizer safely
-            try:
-                viz = MenstrualCycleVisualizer(
-                    os.path.join(os.path.dirname(__file__), "final_merged_hr_hormones.csv")
-                )
-            except Exception as e:
-                st.error(f"❌ Error loading merged dataset: {e}")
-                st.stop()
-    
-            # Sidebar options for merged dataset
-            with st.sidebar:
-                st.subheader("🔍 Choose Visualization (Merged)")
-                plot_type = st.radio(
-                    "Select a visualization:",
-                    [
-                        "Heart Rate by Cycle Phase",
-                        "HR + Hormone Timeseries",
-                        "Correlation Heatmap",
-                        "Heart Rate Variability (HRV)",
-                        "Participant Comparison",
-                        "Circadian Patterns"
-                    ]
-                )
-    
-            # Display plots
-            if plot_type == "Heart Rate by Cycle Phase":
-                viz.plot_hr_by_cycle_phase(save_path="merged_hr_by_phase.png")
-                st.image("merged_hr_by_phase.png")
-    
-            elif plot_type == "HR + Hormone Timeseries":
-                viz.plot_hr_hormone_timeseries(save_path="merged_hr_hormone_timeseries.png")
-                st.image("merged_hr_hormone_timeseries.png")
-    
-            elif plot_type == "Correlation Heatmap":
-                viz.plot_correlation_matrix(save_path="merged_corr_heatmap.png")
-                st.image("merged_corr_heatmap.png")
-    
-            elif plot_type == "Heart Rate Variability (HRV)":
-                viz.plot_hrv_analysis(save_path="merged_hrv.png")
-                st.image("merged_hrv.png")
-    
-            elif plot_type == "Participant Comparison":
-                viz.plot_participant_comparison(save_path="merged_participants.png")
-                st.image("merged_participants.png")
-    
-            elif plot_type == "Circadian Patterns":
-                viz.plot_circadian_patterns(save_path="merged_circadian.png")
-                st.image("merged_circadian.png")
+    else:
+        st.header("📊 Merged Dataset Visualizations")
+        df = period_3.copy()    # ← your merged dataset
+        
+                # Create visualizer safely
+        try:
+            viz = MenstrualCycleVisualizer(
+                os.path.join(os.path.dirname(__file__), "final_merged_hr_hormones.csv")
+            )
+        except Exception as e:
+            st.error(f"❌ Error loading merged dataset: {e}")
+            st.stop()
+        
+                # Sidebar options for merged dataset
+        with st.sidebar:
+            st.subheader("🔍 Choose Visualization (Merged)")
+            plot_type = st.radio(
+                "Select a visualization:",
+                [
+                    "Heart Rate by Cycle Phase",
+                    "HR + Hormone Timeseries",
+                    "Correlation Heatmap",
+                    "Heart Rate Variability (HRV)",
+                    "Participant Comparison",
+                    "Circadian Patterns"
+                ]
+            )
+        
+                # Display plots
+        if plot_type == "Heart Rate by Cycle Phase":
+            viz.plot_hr_by_cycle_phase(save_path="merged_hr_by_phase.png")
+            st.image("merged_hr_by_phase.png")
+        
+        elif plot_type == "HR + Hormone Timeseries":
+            viz.plot_hr_hormone_timeseries(save_path="merged_hr_hormone_timeseries.png")
+            st.image("merged_hr_hormone_timeseries.png")
+        
+        elif plot_type == "Correlation Heatmap":
+            viz.plot_correlation_matrix(save_path="merged_corr_heatmap.png")
+            st.image("merged_corr_heatmap.png")
+        
+        elif plot_type == "Heart Rate Variability (HRV)":
+            viz.plot_hrv_analysis(save_path="merged_hrv.png")
+            st.image("merged_hrv.png")
+        
+        elif plot_type == "Participant Comparison":
+            viz.plot_participant_comparison(save_path="merged_participants.png")
+            st.image("merged_participants.png")
+        
+        elif plot_type == "Circadian Patterns":
+            viz.plot_circadian_patterns(save_path="merged_circadian.png")
+            st.image("merged_circadian.png")
