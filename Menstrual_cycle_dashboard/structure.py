@@ -1427,6 +1427,4 @@ elif page == "Graphs":
             viz.plot_participant_comparison(save_path="merged_participants.png")
             st.image("merged_participants.png")
         
-        elif plot_type == "Circadian Patterns":
-            viz.plot_circadian_patterns(save_path="merged_circadian.png")
-            st.image("merged_circadian.png")
+        
