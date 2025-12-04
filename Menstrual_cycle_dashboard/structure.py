@@ -587,9 +587,10 @@ def load_models():
 
     models = {
         # Model 1 – Heart rate prediction (RandomForestRegressor)
-        "m1_model": load_pickle("model1_hr_prediction.pkl"),
-        "m1_scaler": load_pickle("model1_scaler.pkl"),
-        "m1_features": load_pickle("model1_features.pkl"),
+                # Disable Model 1 (HR prediction)
+        "m1_model": None,
+        "m1_scaler": None,
+        "m1_features": None,
 
         # Model 2 – Phase prediction (LightGBM)
         "m2_model": load_pickle("model2_phase_prediction_lgbm.pkl"),
