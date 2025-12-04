@@ -1,7 +1,9 @@
 streamlit
 pandas
 plotly
-numpy
-matplotlib
 seaborn
+matplotlib
+numpy
 altair
+Pillow
+scipy
