@@ -523,8 +523,8 @@ Understanding these phases is essential for analyzing patterns in **symptoms**, 
 """)
 # --- Page 4: Graphs and EDA ---
 elif page == "Graphs":
-    dataset = st.selectbox("Select a dataset to view:", ["Period 1", "Period 2"])
-    if dataset == "Period 1":
+    dataset = st.selectbox("Select a dataset to view:", ["Kaggle", "Hormones+symptoms", "Heart rate Hormones symptoms merged"])
+    if dataset == "Kaggle":
         st.header("📊 Period 1 Data Visualizations")
 
     # Sidebar: choose a plot
@@ -683,7 +683,7 @@ elif page == "Graphs":
 
             else:
                 st.warning("No menses-related columns found for plotting.")
-    else:
+    elif dataset=="Hormones+symptoms":
         # Sidebar: choose a plot
         with st.sidebar:
             st.subheader("🔍 Choose Visualization")
@@ -697,6 +697,7 @@ elif page == "Graphs":
             ]
         )
         st.title("Cycle Phase Hormone & Symptom Visualizations")
+    
 
 # --- Estrogen Levels by Phase ---
         # 1. Estrogen Levels by Cycle Phase
@@ -830,3 +831,82 @@ elif page == "Graphs":
     
             st.altair_chart(symptoms_chart, use_container_width=True)
             st.markdown(""" During the menstrual phase, most symptoms start to or increase (especially cramps)""")
+        else:
+                st.header("📊 Heart Rate + Hormone + Symptom Visualizations")    
+    st.write("This dataset contains merged heart rate, hormone levels, and daily symptoms.")
+
+    # Sidebar options
+    with st.sidebar:
+        st.subheader("🔍 Choose Visualization")
+        plot_type = st.radio(
+            "Select a visualization:",
+            [
+                "HR by Cycle Phase",
+                "HR + Hormone Time Series",
+                "Correlation Heatmap",
+                "Heart Rate Variability (HRV)",
+                "Multi-Participant Comparison",
+                "Circadian Rhythm Patterns"
+            ]
+        )
+
+    # Load merged dataset & visualizer
+    df = period_3.copy()
+    viz = MenstrualCycleVisualizer("final_merged_hr_hormones.csv")
+
+    # -----------------------------------------------------------
+    # 1️⃣ Heart Rate by Cycle Phase
+    # -----------------------------------------------------------
+    if plot_type == "HR by Cycle Phase":
+        st.subheader("📌 Heart Rate Across Menstrual Phases")
+        viz.plot_hr_by_cycle_phase()
+
+    # -----------------------------------------------------------
+    # 2️⃣ HR + Hormone Time Series
+    # -----------------------------------------------------------
+    elif plot_type == "HR + Hormone Time Series":
+        st.subheader("📈 Heart Rate + Hormone Time Series")
+
+        # Let user choose participant
+        pid = st.sidebar.selectbox(
+            "Choose Participant ID",
+            sorted(df["id"].unique())
+        )
+
+        viz.plot_hr_hormone_timeseries(participant_id=pid)
+
+    # -----------------------------------------------------------
+    # 3️⃣ Correlation Heatmap
+    # -----------------------------------------------------------
+    elif plot_type == "Correlation Heatmap":
+        st.subheader("🔗 Correlation Heatmap (HR & Hormones)")
+        viz.plot_correlation_matrix()
+
+    # -----------------------------------------------------------
+    # 4️⃣ Heart Rate Variability (HRV)
+    # -----------------------------------------------------------
+    elif plot_type == "Heart Rate Variability (HRV)":
+        st.subheader("💓 Heart Rate Variability Analysis")
+        viz.plot_hrv_analysis()
+
+    # -----------------------------------------------------------
+    # 5️⃣ Multi-Participant Comparison
+    # -----------------------------------------------------------
+    elif plot_type == "Multi-Participant Comparison":
+        st.subheader("👥 HR Comparison Across Participants")
+
+        num = st.sidebar.slider(
+            "Number of participants",
+            min_value=3,
+            max_value=12,
+            value=6
+        )
+
+        viz.plot_participant_comparison(n_participants=num)
+
+    # -----------------------------------------------------------
+    # 6️⃣ Circadian Rhythm Patterns
+    # -----------------------------------------------------------
+    elif plot_type == "Circadian Rhythm Patterns":
+        st.subheader("🌙 Circadian Heart Rate Patterns")
+        viz.plot_circadian_patterns()
