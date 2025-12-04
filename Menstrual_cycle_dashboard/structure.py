@@ -13,16 +13,18 @@ def load_data():
     base_path = os.path.dirname(__file__)
     data_path = os.path.join(base_path, "data_imputed.csv")
     final_path = os.path.join(base_path, "final_df.csv")
+    merged_hr_dataset=os.path.join(base_path, "final_merged_hr_hormones.csv")
 
     period_1 = pd.read_csv(data_path)
     period_2 = pd.read_csv(final_path)
+    period_3 = pd.read_csv(merged_hr_dataset)
 
-    return period_1, period_2
+    return period_1, period_2, period_3
     
-period_1, period_2 = load_data()
+period_1, period_2, period_3 = load_data()
 
 def decode_phase(phase_encoded):
-    phase_map = {1: 'Follicular', 2: 'Fertility', 3: 'Luteal', 4: 'Menstrual'}
+    phase_map = {1: 'Follicular', 2: 'Fertility', 3: 'Luteal', 4: 'Menstruall'}
     return phase_map.get(phase_encoded, 'Unknown')
 
 # --- Sidebar Navigation ---
