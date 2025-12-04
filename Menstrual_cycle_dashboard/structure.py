@@ -47,7 +47,7 @@ if page == "README":
     """)
 
 # --- Page 2: Data Description ---
-elif page == "Data Description"
+elif page == "Data Description":
     st.header("📄 Dataset Overview")
     
     # Updated selectbox including the merged dataset
