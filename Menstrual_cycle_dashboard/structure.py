@@ -1466,7 +1466,7 @@ elif page == "Graphs":
    # =========================================================
 #                   📘   ML MODELS PAGE
 # =========================================================
-elif page == "ML Models":
+elif page == "ML models":
 
     st.title("🤖 Machine Learning Models")
     st.markdown("Explore predictions from your trained ML models — Phase & Cycle Length.")
