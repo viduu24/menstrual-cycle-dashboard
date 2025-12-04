@@ -1918,64 +1918,7 @@ It provides a complete machine-learning pipeline applied to a real human physiol
     # -------------------------------------
     # STREAMLIT PAGE LAYOUT
     # -------------------------------------
-    st.title("📊 Machine Learning Models Overview")
-    st.write("""
-    This page summarizes the **two machine learning models** developed in this project:
-    1. **Phase Prediction Model** — classifies cycle phase  
-    2. **Cycle Length Prediction Model** — predicts length of menstrual cycle  
-    """)
     
-    
-    # -------------------------------------------------------
-    # SECTION 1 — PHASE PREDICTION MODEL
-    # -------------------------------------------------------
-    st.header("🔮 Model 2: Phase Prediction (Classification)")
-    
-    with st.expander("📌 Model Description"):
-        st.markdown(model2_metrics["Model Description"])
-    
-    st.subheader("📈 Performance Metrics")
-    
-    col1, col2 = st.columns(2)
-    with col1:
-        st.metric("Training Accuracy", f"{model2_metrics['Training Accuracy']:.3f}")
-    with col2:
-        st.metric("Macro F1-score", f"{model2_metrics['Macro F1-score']:.3f}")
-    
-    st.markdown("### 🧩 Interpretation of Results")
-    st.info("""
-    - Accuracy around **0.95** and Macro F1 of **0.95** are reasonable  
-    - Phase prediction is hard because phase boundaries overlap  
-    - Fertility phase is especially difficult to classify  
-    - Model performs best on **Luteal** and **Follicular** phases  
-    """)
-    
-    
-    
-    
-    # -------------------------------------------------------
-    # SECTION 2 — CYCLE LENGTH PREDICTION MODEL
-    # -------------------------------------------------------
-    st.header("📏 Model 3: Cycle Length Prediction (Regression)")
-    
-    with st.expander("📌 Model Description"):
-        st.markdown(model3_metrics["Model Description"])
-    
-    st.subheader("📈 Performance Metrics")
-    
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        st.metric("RMSE", f"{model3_metrics['RMSE']:.3f}")
-    with col2:
-        st.metric("MAE", f"{model3_metrics['MAE']:.3f}")
-    with col3:
-        st.metric("R² Score", f"{model3_metrics['R² Score']:.3f}")
-    
-    st.markdown("### 🧠 Interpretation of Results")
-    st.info(model3_metrics["Interpretation"])
-    
-    st.write("---")
-    st.success("📌 All ML models trained successfully and results documented above.")
 
    # =========================================================
 #                   📘   ML MODELS PAGE
