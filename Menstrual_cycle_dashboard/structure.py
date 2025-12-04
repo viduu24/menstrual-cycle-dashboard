@@ -190,15 +190,20 @@ elif page == "Data Description":
    
 # --- Page 3: Missingness ---
 elif page=="Missingness":
-    dataset = st.selectbox("Select a dataset to view:", ["Period 1", "Period 2"])
-    if dataset =="Period 1":
+    dataset = st.selectbox("Select a dataset to view:", ["Kaggle", "Hormones+symptoms", "heart rate and hormones symptoms merged"])
+    if dataset =="Kaggle":
         base_path = os.path.dirname(__file__)
         img_path = os.path.join(base_path, "missing_values_heatmap.png")
         img = Image.open(img_path)
         st.image(img, caption="Missing Values Heatmap", use_column_width=True)
-    else:
+    elif dataset == "Hormones+symptoms":
         base_path = os.path.dirname(__file__)
         img_path = os.path.join(base_path, "missing_values_heatmap1.png")
+        img = Image.open(img_path)
+        st.image(img, caption="Missing Values Heatmap", use_column_width=True)
+    else:
+        base_path = os.path.dirname(__file__)
+        img_path = os.path.join(base_path, "hr_missingvalues.png")
         img = Image.open(img_path)
         st.image(img, caption="Missing Values Heatmap", use_column_width=True)
 # --- Page 4: Cleaning Process ---
