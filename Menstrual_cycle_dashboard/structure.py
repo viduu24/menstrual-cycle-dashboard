@@ -7,8 +7,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import altair as alt
 from PIL import Image
-from scipy import stats
-from scipy.signal import find_peaks
+
 
 class MenstrualCycleVisualizer:
     """
