@@ -593,13 +593,13 @@ def load_models():
         "m1_features": None,
 
         # Model 2 – Phase prediction (LightGBM)
-        "m2_model": load_pickle("model2_phase_prediction_lgbm.pkl"),
+        "m2_model": load_pickle("model2_phase_prediction.pkl"),
         "m2_scaler": load_pickle("model2_scaler.pkl"),
         "m2_encoder": load_pickle("model2_encoder.pkl"),
         "m2_features": load_pickle("model2_features.pkl"),
 
         # Model 3 – Regularity prediction (RandomForestClassifier)
-        "m3_model": load_pickle("model3_regularity.pkl"),
+        "m3_model": load_pickle("model3_cycle_length.pkl"),
         "m3_scaler": load_pickle("model3_scaler.pkl"),
         "m3_features": load_pickle("model3_features.pkl"),
     }
