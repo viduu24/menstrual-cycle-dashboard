@@ -1401,8 +1401,7 @@ elif page == "Graphs":
                     "HR + Hormone Timeseries",
                     "Correlation Heatmap",
                     "Heart Rate Variability (HRV)",
-                    "Participant Comparison",
-                    "Circadian Patterns"
+                    "Participant Comparison"
                 ]
             )
         
