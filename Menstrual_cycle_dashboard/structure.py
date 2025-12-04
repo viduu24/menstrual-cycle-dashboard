@@ -1686,6 +1686,164 @@ elif page == "Guide on using the predictions feature":
 elif page == "ML models":
     import streamlit as st
     import pandas as pd
+    st.markdown("""
+# 🤖 Machine Learning Models in This Project
+
+This section explains the machine learning models used in the dashboard, why they were chosen,  
+and how they contribute to understanding menstrual cycle patterns.
+
+The project includes **two primary models**:
+
+1. **Phase Prediction Model (Model 2)** – predicts which menstrual phase a user is in  
+2. **Cycle Length Prediction Model (Model 3)** – predicts a user’s cycle length using symptoms and flow patterns  
+
+Both models were designed to be:
+- Small enough to run on Streamlit Cloud  
+- Accurate and stable  
+- Built using interpretable features  
+- Compatible with scikit-learn 1.3.2 (required to avoid pickle errors on Streamlit)
+
+---
+
+# 🌙 **Model 2: Phase Prediction (XGBoost)**
+The menstrual cycle is divided into four physiological phases:
+
+- **Follicular Phase**  
+- **Fertile Window**  
+- **Luteal Phase**  
+- **Menstrual Phase**
+
+This model predicts the phase of the cycle using daily biological indicators.
+
+## 📌 **Why XGBoost?**
+XGBoost was chosen because:
+- It handles non-linear relationships effectively  
+- It performs well even when features have different scales  
+- It is compact and produces small model files (critical for GitHub + Streamlit deployment)  
+- It captures subtle hormone–cycle interactions much better than logistic regression or basic random forests  
+
+## 📌 **Features Used**
+To make the model biologically relevant, we engineered high-value features:
+
+### **Hormones**
+- Estrogen  
+- PDG  
+- LH  
+- First-order changes (Δ1): how hormones change from yesterday  
+- Z-scores: normalized hormone fluctuations  
+- Log-scaled hormone values  
+
+### **Cycle Timing**
+- Cycle day (1–28)  
+- Normalized cycle position  
+- Cycle week  
+- Ovulation indicator (day 12–16)  
+
+### **Heart-Rate Biomarkers**
+- Mean heart rate  
+- 1-day lagged heart rate  
+- 7-day rolling average of heart rate  
+
+### **Symptoms**
+- Total symptom score per day  
+- Number of symptoms present  
+- Average symptom intensity  
+
+This creates a rich representation of the physiological state of each day.
+
+---
+
+## 🎯 **Model Performance**
+After hyperparameter tuning and evaluation:
+
+### **Training Accuracy:** **0.952**  
+### **Macro F1-Score:** **0.952**
+
+These results indicate that the model can **very reliably distinguish between the four phases**.
+
+### ✔ Strengths of the Model
+- Excellent prediction of **Fertile Window**, which is typically the hardest phase to classify  
+- Strong separation between **Follicular vs. Luteal** phases  
+- Hormone patterns are captured extremely well  
+- Very low confusion across classes  
+
+---
+
+# 🩺 **Model 3: Cycle Length Prediction (Random Forest Regression)**
+
+This model predicts the length of a user's cycle based on their symptoms and menstrual flow patterns.
+
+## 📌 Why Predict Cycle Length?
+Cycle length is one of the most important indicators of menstrual health.  
+Predicting it helps users understand:
+- Whether their cycle is regular  
+- How symptoms correlate with longer or shorter cycles  
+- How flow intensity and menses duration relate to cycle timing  
+
+This model transforms the qualitative symptom data into meaningful numerical predictors.
+
+---
+
+## 📌 **Features Used**
+Model 3 uses the Kaggle dataset, which contains cycle-level summary features:
+
+### **Cycle Flow and Symptom Features**
+- Mean bleeding intensity  
+- Total number of high-flow days  
+- Total menstrual score  
+- Menses duration  
+- Daily bleeding scores (Day 1–Day 10)  
+
+These features capture **how heavy**, **how long**, and **how consistent** a cycle is — all strong predictors of cycle length.
+
+---
+
+## 🎯 **Model Performance**
+Evaluation on the test dataset gives:
+
+- **RMSE:** 3.24 days  
+- **MAE:** 2.39 days  
+- **R² Score:** 0.245  
+
+### ✔ Interpretation
+Cycle length is **difficult to predict** due to high biological variability.  
+However:
+- The model captures general trends effectively  
+- Heavy or longer bleeding patterns correspond to longer cycles  
+- Short cycles tend to have shorter or lower-flow bleeding  
+
+This model is **explanatory**, not diagnostic — it helps users understand relationships between flow patterns and timing.
+
+---
+
+# 🧠 **Why These Models Matter**
+Together, the models allow users to:
+
+### ⭐ Understand their cycle daily  
+The Phase Prediction model reveals where they are in the cycle using hormones, symptoms, and heart rate.
+
+### ⭐ Understand their cycle monthly  
+The Cycle Length model shows how bleeding patterns influence overall cycle duration.
+
+### ⭐ Gain accessible, data-driven insights  
+Without needing medical knowledge, users can see how their body changes across the month.
+
+---
+
+# 🎓 **Academic Significance**
+This project demonstrates:
+- Time-series feature engineering  
+- Hormone modeling  
+- Physiological signal integration (heart rate + symptoms)  
+- Multi-class classification  
+- Regression modeling  
+- Model deployment and persistence  
+- Cloud compatibility constraints (model size, pickle versions)  
+
+It provides a complete machine-learning pipeline applied to a real human physiology use-case.
+
+""")
+
     
     # -------------------------------------
     # LOAD METRICS THAT YOU REPORTED EARLIER
