@@ -569,14 +569,49 @@ def load_data():
     return period_1, period_2, period_3
     
 period_1, period_2, period_3 = load_data()
+#load models
+@st.cache_resource
+def load_models():
+    """
+    Load all trained ML models & scalers from the models/ folder.
+    Cached so they load only once.
+    """
+    base_path = os.path.dirname(__file__)
+    model_dir = os.path.join(base_path, "models")
+
+    def load_pickle(name):
+        path = os.path.join(model_dir, name)
+        return joblib.load(path)
+
+    models = {
+        # Model 1 – Heart rate prediction (RandomForestRegressor)
+        "m1_model": load_pickle("model1_hr_prediction.pkl"),
+        "m1_scaler": load_pickle("model1_scaler.pkl"),
+        "m1_features": load_pickle("model1_features.pkl"),
+
+        # Model 2 – Phase prediction (LightGBM)
+        "m2_model": load_pickle("model2_phase_prediction_lgbm.pkl"),
+        "m2_scaler": load_pickle("model2_scaler.pkl"),
+        "m2_encoder": load_pickle("model2_encoder.pkl"),
+        "m2_features": load_pickle("model2_features.pkl"),
+
+        # Model 3 – Regularity prediction (RandomForestClassifier)
+        "m3_model": load_pickle("model3_regularity.pkl"),
+        "m3_scaler": load_pickle("model3_scaler.pkl"),
+        "m3_features": load_pickle("model3_features.pkl"),
+    }
+    return models
+
+models = load_models()
+
 
 def decode_phase(phase_encoded):
-    phase_map = {1: 'Follicular', 2: 'Fertility', 3: 'Luteal', 4: 'Menstruall'}
+    phase_map = {1: 'Follicular', 2: 'Fertility', 3: 'Luteal', 4: 'Menstrual'}
     return phase_map.get(phase_encoded, 'Unknown')
 
 # --- Sidebar Navigation ---
 st.sidebar.title("🩸 Menstrual Cycle Dashboard")
-page = st.sidebar.radio("Go to", ["README", "Data Description", "Missingness","Cleaning Process", "Information","Graphs"])
+page = st.sidebar.radio("Go to", ["README", "Data Description", "Missingness","Cleaning Process", "Information","Graphs", "ML models"])
 
 # --- Page 1: README ---
 if page == "README":
