@@ -7,3 +7,7 @@ numpy
 altair
 Pillow
 scipy
+
+joblib
+lightgbm
+imbalanced-learn
