@@ -3,7 +3,7 @@ import streamlit as st
 def show():
     st.markdown("### 🌺 Understanding the Menstrual Cycle")
 
-st.markdown("""
+    st.markdown("""
 <div style='text-align: justify;'>
 
 The menstrual cycle is a repeating process, typically lasting **28 days**, though it varies from person to person. It is driven by changing hormone levels and divided into four main phases:
