@@ -1,3 +1,4 @@
+import streamlit as st
 def show_ml_models():
     st.markdown("""
 # 🤖 Machine Learning Models in This Project
