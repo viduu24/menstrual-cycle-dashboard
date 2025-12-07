@@ -12,10 +12,10 @@ def show():
     # ==================== KAGGLE DATASET ====================
     if dataset == "Kaggle Menstrual Cycle":
         tabs = st.tabs([
-            " Overview", 
-            " Phase 1: Demographics", 
-            " Phase 2: Cycle Variables",
-            " Validation"
+            "📋 Overview", 
+            "👤 Phase 1: Demographics", 
+            "🔄 Phase 2: Cycle Variables",
+            "✅ Validation"
         ])
         
         with tabs[0]:
@@ -31,7 +31,7 @@ def show():
             
             st.markdown("---")
             st.markdown("""
-            ### Key Design Principles
+            ### 🎯 Key Design Principles
             
             1. **Context-Aware**: Uses participant history before population patterns
             2. **Biologically Informed**: Preserves BMI distribution, enforces physiological constraints
@@ -40,18 +40,18 @@ def show():
             """)
             
             st.markdown("---")
-            st.markdown("### Imputation Flow")
+            st.markdown("### 📊 Imputation Flow")
             st.code("""
-            Phase 1: Demographics
-            ├── Step 1: Within-participant median (Weight, Height, Age, etc.)
-            ├── Step 2: MICE for Weight (preserves BMI distribution)
-            └── Step 3: MICE for remaining variables
-            
-            Phase 2: Cycle Variables
-            ├── Step 0: MensesScore filled with 0
-            ├── Step 1: MICE with 10 iterations
-            ├── Step 2: Post-processing (rounding, constraints)
-            └── Step 3: Fallback (median/mode)
+Phase 1: Demographics
+├── Step 1: Within-participant median (Weight, Height, Age, etc.)
+├── Step 2: MICE for Weight (preserves BMI distribution)
+└── Step 3: MICE for remaining variables
+
+Phase 2: Cycle Variables
+├── Step 0: MensesScore filled with 0
+├── Step 1: MICE with 10 iterations
+├── Step 2: Post-processing (rounding, constraints)
+└── Step 3: Fallback (median/mode)
             """, language="text")
         
         with tabs[1]:
@@ -60,7 +60,7 @@ def show():
             st.markdown("### 🔹 Step 1: Group-Based Imputation")
             st.info("**Method:** Within-participant median filling")
             
-            with st.expander(" Details", expanded=True):
+            with st.expander("📝 Details", expanded=True):
                 st.markdown("""
                 **Variables Targeted:**
                 - Weight
@@ -88,7 +88,7 @@ for participant in participants:
             st.markdown("### 🔹 Step 2: Targeted Weight Imputation")
             st.warning("**Method:** MICE (Multiple Imputation by Chained Equations)")
             
-            with st.expander(" Details", expanded=True):
+            with st.expander("📝 Details", expanded=True):
                 st.markdown("""
                 **Special Feature:** BMI Distribution Preservation
                 
@@ -122,7 +122,7 @@ imputed_weight = clip(imputed_weight, percentile_1, percentile_99)
             st.markdown("### 🔹 Step 3: Advanced Imputation")
             st.success("**Method:** MICE for remaining variables")
             
-            with st.expander(" Details", expanded=True):
+            with st.expander("📝 Details", expanded=True):
                 st.markdown("""
                 **Scope:**  
                 Any columns still missing after group imputation (excluding Weight, 
@@ -142,7 +142,7 @@ imputed_weight = clip(imputed_weight, percentile_1, percentile_99)
             st.markdown("### 🔹 Step 0: MensesScore Handling")
             st.info("**All MensesScoreDay variables filled with 0** (not imputed)")
             
-            with st.expander(" Rationale"):
+            with st.expander("💡 Rationale"):
                 st.markdown("""
                 Missing MensesScore likely means no bleeding occurred on that day.
                 Therefore, filling with 0 is more appropriate than imputation.
@@ -812,4 +812,204 @@ for participant in some_participants:
                 
                 st.code("""
 # Calculate trend using rolling mean
-hr_daily['hr_trend'] = hr_daily.groupby('id')['hr_mean'].transform(
+hr_daily['hr_trend'] = (
+    hr_daily.groupby('id')['hr_mean']
+    .transform(lambda x: x.rolling(window=7, min_periods=1, center=True).mean())
+)
+                """, language="python")
+                
+                st.info("This smooths out day-to-day variations to reveal underlying patterns")
+            
+            with imputation_steps[1]:
+                st.markdown("### 📅 Weekly Seasonality")
+                st.markdown("""
+                Captures biological rhythms (sleep/wake cycles, weekly patterns).
+                
+                **Method:** Day of week effect (day_in_study % 7)
+                """)
+                
+                st.code("""
+# Calculate weekly seasonality
+hr_daily['day_of_week'] = hr_daily['day_in_study'] % 7
+weekly_pattern = hr_daily.groupby(['id', 'day_of_week'])['hr_mean'].transform('mean')
+hr_daily['hr_seasonal'] = weekly_pattern
+                """, language="python")
+                
+                st.success("People often have consistent patterns on the same day of the week")
+            
+            with imputation_steps[2]:
+                st.markdown("### 🔗 Linear Interpolation")
+                st.markdown("""
+                Fills gaps between known values with smooth transitions.
+                
+                **Method:** Linear interpolation per participant
+                """)
+                
+                st.code("""
+# Interpolate missing values
+hr_daily['hr_interpolated'] = (
+    hr_daily.groupby('id')['hr_mean']
+    .transform(lambda x: x.interpolate(method='linear', limit_direction='both'))
+)
+                """, language="python")
+                
+                st.info("Creates smooth curves between data points rather than sharp jumps")
+            
+            with imputation_steps[3]:
+                st.markdown("### 🔄 Final Fallback Mean")
+                st.markdown("""
+                Only used if a participant has too few HR records for other methods.
+                
+                **Method:** Participant mean or global mean
+                """)
+                
+                st.code("""
+# Final fallback for any remaining missing values
+for participant_id in hr_daily['id'].unique():
+    mask = hr_daily['id'] == participant_id
+    participant_data = hr_daily[mask]
+    
+    if participant_data['hr_mean'].isna().all():
+        # Use global mean if participant has no HR data
+        hr_daily.loc[mask, 'hr_mean'] = hr_daily['hr_mean'].mean()
+    else:
+        # Use participant mean
+        hr_daily.loc[mask, 'hr_mean'] = (
+            hr_daily.loc[mask, 'hr_mean'].fillna(participant_data['hr_mean'].mean())
+        )
+                """, language="python")
+                
+                st.warning("This is rarely needed but ensures 100% completeness")
+            
+            st.markdown("---")
+            st.success("""
+            **Result:** Smooth, realistic HR curves that maintain:
+            - Individual participant patterns
+            - Biological rhythms
+            - Temporal continuity
+            - No artificial jumps or outliers
+            """)
+        
+        with tabs[5]:
+            st.subheader("🔗 Step 5: Merging Heart Rate with Hormones")
+            
+            st.info("After cleaning HR data, merge it with hormone/symptom dataset")
+            
+            st.markdown("### 🔑 Merge Key")
+            
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                st.code("""
+Merge on:
+- id (participant)
+- day_in_study (day)
+                """, language="text")
+            
+            with col2:
+                st.code("""
+Type: Inner join
+(keeps only matching records)
+                """, language="text")
+            
+            st.markdown("---")
+            st.markdown("### 💻 Implementation")
+            
+            with st.expander("View Merge Code", expanded=True):
+                st.code("""
+# Merge HR with hormones
+merged_df = pd.merge(
+    hormone_symptom_df,
+    hr_daily,
+    on=['id', 'day_in_study'],
+    how='inner'
+)
+
+# Verify merge
+print(f"Hormone records: {len(hormone_symptom_df)}")
+print(f"HR records: {len(hr_daily)}")
+print(f"Merged records: {len(merged_df)}")
+                """, language="python")
+            
+            st.markdown("---")
+            st.markdown("### ⚡ Merged Dataset Contains")
+            
+            content_tabs = st.tabs([
+                "HR Metrics",
+                "Hormones",
+                "Symptoms",
+                "Cycle Info"
+            ])
+            
+            with content_tabs[0]:
+                st.markdown("""
+                **Heart Rate Variables:**
+                - hr_mean
+                - hr_min
+                - hr_max
+                - hr_std
+                - hr_count
+                """)
+            
+            with content_tabs[1]:
+                st.markdown("""
+                **Hormone Measurements:**
+                - pdg (progesterone metabolite)
+                - estrogen markers
+                - Other hormonal indicators
+                """)
+            
+            with content_tabs[2]:
+                st.markdown("""
+                **Self-Reported Symptoms:**
+                - headaches, cramps, fatigue
+                - mood swings, stress
+                - sleep quality
+                - appetite, food cravings
+                - And more...
+                """)
+            
+            with content_tabs[3]:
+                st.markdown("""
+                **Cycle Information:**
+                - Menstrual phase
+                - Day in cycle
+                - Flow characteristics
+                - Ovulation indicators
+                """)
+            
+            st.markdown("---")
+            st.markdown("### 🎯 Use Cases")
+            
+            use_col1, use_col2 = st.columns(2)
+            
+            with use_col1:
+                st.success("""
+                **Machine Learning:**
+                - Heart Rate Prediction
+                - Phase Classification
+                - Symptom Prediction
+                """)
+            
+            with use_col2:
+                st.success("""
+                **Analysis:**
+                - Feature Engineering
+                - Correlation Studies
+                - Pattern Discovery
+                """)
+            
+            st.markdown("---")
+            st.markdown("### 💾 Output File")
+            
+            st.code("""
+final_merged_hr_hormones.csv
+            """, language="text")
+            
+            st.success("""
+            ✅ **Complete Dataset Ready For:**
+            - Machine learning model training
+            - Statistical analysis
+            - Visualization
+            - Research insights
+            """)
