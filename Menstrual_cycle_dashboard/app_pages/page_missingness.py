@@ -3,7 +3,7 @@ from PIL import Image
 import os
 
 def show():
-    st.header("📊 Missingness Analysis")
+    st.header("Missingness Analysis")
     
     dataset = st.selectbox(
         "Select a dataset to view:",
@@ -21,6 +21,7 @@ def show():
         img_path = os.path.join(base_path, "missing_values_heatmap1.png")
         img = Image.open(img_path)
         st.image(img, caption="Missing Values Heatmap - Hormones+Symptoms Dataset", use_column_width=True)
+        
         
     else:
         img_path = os.path.join(base_path, "hr_missingvalues.png")
