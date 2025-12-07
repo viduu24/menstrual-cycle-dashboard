@@ -1,0 +1,23 @@
+# Import all individual page modules
+from . import page_readme
+from . import page_data_description
+from . import page_missingness
+from . import page_cleaning
+from . import page_information
+from . import page_graphs
+from . import page_ml_models
+from . import page_guide
+from . import page_predictions
+
+# Make all pages available
+__all__ = [
+    'page_readme',
+    'page_data_description',
+    'page_missingness',
+    'page_cleaning',
+    'page_information',
+    'page_graphs',
+    'page_ml_models',
+    'page_guide',
+    'page_predictions'
+]
