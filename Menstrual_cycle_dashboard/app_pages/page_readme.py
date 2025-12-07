@@ -1,8 +1,10 @@
 import streamlit as st
 
 def show():
-    st.title("<div style="text-align: center;">
-    🌸 Menstrual Cycle Analysis Dashboard")
+    st.markdown("""
+    <h1 style='text-align: center;'>🌸 Menstrual Cycle Analysis Dashboard</h1>
+    """, unsafe_allow_html=True)
+
     st.markdown("""
 <div style="text-align: center;">
 
@@ -60,6 +62,5 @@ Understanding menstrual health helps users:
 - Improve cycle tracking  
 - Build awareness of how the body changes throughout the month  
 
-This dashboard makes menstrual science accessible, visual, and easy to explore.
-
-""")
+</div>
+""", unsafe_allow_html=True)
