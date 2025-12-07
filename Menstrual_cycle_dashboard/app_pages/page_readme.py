@@ -6,61 +6,21 @@ def show():
     """, unsafe_allow_html=True)
 
     st.markdown("""
-<div style="text-align: center justify;">
+<div style='text-align: justify;'>
 
-This interactive dashboard helps users explore menstrual cycle patterns using real-world datasets.  
-It is designed especially for people who **are new to menstrual health** and want to understand how  
-different biological and lifestyle factors influence the menstrual cycle.
+This project aims to guide users — from cleaning missing values, looking into some EDA done for the datasets, exploring insights through visualizations, and finally integrating ML for predicting cycle phase and cycle length . The dashboard integrates hormone data, symptom logs, heart-rate patterns, and cycle information to reveal how biological and lifestyle factors shape the menstrual cycle.
 
----
-
-## 🎯 **What This App Does**
-
-### **1. Clean & Prepare Menstrual Data**
-The raw datasets contain hormone levels, symptoms, heart rate, and cycle information.  
-The app automatically:
-- Removes missing or incorrect values  
-- Merges data from multiple sources  
-- Creates meaningful features such as *cycle day*, *phase*, *hormone patterns*, and more  
+The goal is to make menstrual health more understandable for everyone, especially beginners, by highlighting meaningful trends, correlations, and phase-based patterns across the cycle.
 
 ---
 
-### **2. Visualize Menstrual Cycle Patterns**
-To help beginners understand the menstrual cycle, the app provides clear visualizations of:
-- Daily hormone fluctuations  
-- Heart-rate changes across the cycle  
-- Symptom patterns (cramps, bloating, mood changes, etc.)  
-- Cycle length and flow intensity trends  
+### 🔍 **Next Steps**
+Use the sidebar to:
 
-These charts make it easier to see how the cycle works across different phases.
-
----
-
-### **3. Explore Factors That Influence the Cycle**
-The dashboard helps users investigate:
-- How hormones affect cycle phases  
-- Which symptoms are most common  
-- How lifestyle factors such as sleep, stress, and heart rate correlate with cycle patterns  
-- What predicts shorter or longer cycles  
-
----
-
-## 🌼 **Who Is This Dashboard For?**
-This app is built for:
-- Individuals who want to **learn about their menstrual cycle**
-- Students or researchers exploring menstrual health data
-- Anyone curious about how hormone, symptom, or lifestyle patterns change across the cycle  
-
-You **do not** need prior medical or data-science knowledge — the dashboard explains everything step by step.
-
----
-
-## 💡 **Why This Matters**
-Understanding menstrual health helps users:
-- Recognize what's normal  
-- Identify unusual patterns  
-- Improve cycle tracking  
-- Build awareness of how the body changes throughout the month  
+- View cleaned datasets with summary statistics  
+- Explore visualizations showing hormone patterns, heart-rate changes, and symptom trends   
+- Try out machine-learning powered predictions for cycle phase and cycle length  
 
 </div>
 """, unsafe_allow_html=True)
+
