@@ -62,7 +62,7 @@ def show(period_1, period_2, period_3):
     st.write(df.describe())
 
     st.markdown("---")
-    st.subheader("📊 Key Visualizations")
+    
 
     # ----------------------------------------------------------
     # 1️⃣ PERIOD 1: PIE CHART – LENGTH OF MENSES
