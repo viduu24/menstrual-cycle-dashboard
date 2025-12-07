@@ -63,7 +63,7 @@ def show(period_1, period_2, period_3):
     st.write(df.describe())
 
     st.markdown("---")
-    st.subheader("📊 Key Visualizations")
+    
 
     # ----------------------------------------------------------
     # 1️⃣ PERIOD 1 — PIE CHART OF LENGTH OF MENSES
@@ -71,7 +71,7 @@ def show(period_1, period_2, period_3):
     if dataset.startswith("Period 1"):
 
         if "LengthofMenses" in df.columns:
-            st.markdown("### 🔹 Length of Menses (Pie Chart)")
+            st.markdown("### Length of Menses (Pie Chart)")
 
             fig = px.pie(
                 df,
@@ -97,7 +97,7 @@ def show(period_1, period_2, period_3):
                 break
 
         if phase_col:
-            st.markdown("### 🔹 Distribution of Cycle Phases")
+            st.markdown("### Distribution of Cycle Phases")
 
             # Decode mapping (adjust if needed)
             phase_map = {
@@ -140,7 +140,7 @@ def show(period_1, period_2, period_3):
 
         if len(hr_cols) > 0:
             hr_col = hr_cols[0]  # Use first HR-related column
-            st.markdown(f"### 🔹 Heart Rate Distribution — **{hr_col}**")
+            st.markdown(f"### Heart Rate Distribution — **{hr_col}**")
 
             fig = px.histogram(
                 df,
