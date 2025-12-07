@@ -13,7 +13,7 @@ def show(period_1, period_2, period_3):
     # Select dataset
     if dataset.startswith("Period 1"):
         df = period_1
-        st.markdown("###Demographic and Cycle Information")
+        st.markdown("### Demographic and Cycle Information")
         st.markdown("""
         - Source: Kaggle
         - Per-cycle dataset with demographic and cycle information  
@@ -22,7 +22,7 @@ def show(period_1, period_2, period_3):
         
     elif dataset.startswith("Period 2"):
         df = period_2
-        st.markdown("###Hormones and Symptoms Dataset")
+        st.markdown("### Hormones and Symptoms Dataset")
         st.markdown("""
         - Source: PhysioNet
         - Daily dataset with hormones, symptoms, and heart rate  
@@ -31,7 +31,7 @@ def show(period_1, period_2, period_3):
         
     else:
         df = period_3
-        st.markdown("###Heart Rate and Hormones+Symptoms Dataset")
+        st.markdown("### Heart Rate and Hormones+Symptoms Dataset")
         st.markdown("""
         - PhysioNet
         - This dataset has the heart rate dataset combined with the symptoms, hormones dataset 
