@@ -56,3 +56,7 @@ The Cycle Length model shows how bleeding patterns influence duration.
 ### ⭐ Gain accessible, data-driven insights  
 Users can see how their body changes across the month.
 """)
+
+# REQUIRED by your app router
+def show():
+    show_ml_models()
