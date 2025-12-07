@@ -1,7 +1,7 @@
 import streamlit as st
 
 def show():
-    st.header("🧹 Data Cleaning & Imputation Process")
+    st.header("Data Cleaning & Imputation Process")
     
     # Dataset selection
     dataset = st.selectbox(
@@ -12,10 +12,10 @@ def show():
     # ==================== KAGGLE DATASET ====================
     if dataset == "Kaggle Menstrual Cycle":
         tabs = st.tabs([
-            "📋 Overview", 
-            "👤 Phase 1: Demographics", 
-            "🔄 Phase 2: Cycle Variables",
-            "✅ Validation"
+            "Overview", 
+            "Phase 1: Demographics", 
+            "Phase 2: Cycle Variables",
+            "Validation"
         ])
         
         with tabs[0]:
@@ -31,7 +31,7 @@ def show():
             
             st.markdown("---")
             st.markdown("""
-            ### 🎯 Key Design Principles
+            ### Key Design Principles
             
             1. **Context-Aware**: Uses participant history before population patterns
             2. **Biologically Informed**: Preserves BMI distribution, enforces physiological constraints
@@ -40,7 +40,7 @@ def show():
             """)
             
             st.markdown("---")
-            st.markdown("### 📊 Imputation Flow")
+            st.markdown("### Imputation Flow")
             st.code("""
 Phase 1: Demographics
 ├── Step 1: Within-participant median (Weight, Height, Age, etc.)
@@ -88,7 +88,7 @@ for participant in participants:
             st.markdown("### 🔹 Step 2: Targeted Weight Imputation")
             st.warning("**Method:** MICE (Multiple Imputation by Chained Equations)")
             
-            with st.expander("📝 Details", expanded=True):
+            with st.expander("Details", expanded=True):
                 st.markdown("""
                 **Special Feature:** BMI Distribution Preservation
                 
@@ -122,7 +122,7 @@ imputed_weight = clip(imputed_weight, percentile_1, percentile_99)
             st.markdown("### 🔹 Step 3: Advanced Imputation")
             st.success("**Method:** MICE for remaining variables")
             
-            with st.expander("📝 Details", expanded=True):
+            with st.expander("Details", expanded=True):
                 st.markdown("""
                 **Scope:**  
                 Any columns still missing after group imputation (excluding Weight, 
@@ -139,23 +139,23 @@ imputed_weight = clip(imputed_weight, percentile_1, percentile_99)
         with tabs[2]:
             st.subheader("Phase 2: Cycle-Specific Variables")
             
-            st.markdown("### 🔹 Step 0: MensesScore Handling")
+            st.markdown("### Step 0: MensesScore Handling")
             st.info("**All MensesScoreDay variables filled with 0** (not imputed)")
             
-            with st.expander("💡 Rationale"):
+            with st.expander("Rationale"):
                 st.markdown("""
                 Missing MensesScore likely means no bleeding occurred on that day.
                 Therefore, filling with 0 is more appropriate than imputation.
                 """)
             
             st.markdown("---")
-            st.markdown("### 🔹 Step 1: Iterative Imputation (MICE)")
+            st.markdown("### Step 1: Iterative Imputation (MICE)")
             st.warning("**Configuration:** 10 iterations max, BayesianRidge estimator")
             
             col1, col2 = st.columns(2)
             
             with col1:
-                st.markdown("**🎯 Target Variables (9 total):**")
+                st.markdown("**Target Variables (9 total):**")
                 st.markdown("""
                 - LengthofMenses
                 - LengthofLutealPhase
@@ -169,7 +169,7 @@ imputed_weight = clip(imputed_weight, percentile_1, percentile_99)
                 """)
             
             with col2:
-                st.markdown("**📊 Predictors Used:**")
+                st.markdown("**Predictors Used:**")
                 st.markdown("""
                 - Demographics (Age, Weight, BMI, Schoolyears)
                 - Cycle characteristics (CycleNumber, LengthofCycle)
@@ -178,7 +178,7 @@ imputed_weight = clip(imputed_weight, percentile_1, percentile_99)
                 - Complete MensesScore columns
                 """)
             
-            with st.expander("🔧 Technical Details"):
+            with st.expander("Technical Details"):
                 st.code("""
 from sklearn.experimental import enable_iterative_imputer
 from sklearn.impute import IterativeImputer
@@ -198,7 +198,7 @@ imputed_data = imputer.fit_transform(cycle_variables)
             st.markdown("### 🔹 Step 2: Post-Processing")
             st.success("**Ensure biological plausibility**")
             
-            with st.expander("📝 Operations Performed", expanded=True):
+            with st.expander("Operations Performed", expanded=True):
                 st.markdown("""
                 1. **Round categorical variables** to integers
                 2. **Round count variables** and clip to ≥0
@@ -222,7 +222,7 @@ df['LengthofLutealPhase'] = df[['LengthofLutealPhase', 'LengthofCycle']].min(axi
             st.markdown("### 🔹 Step 3: Fallback Safety Net")
             st.error("**Last Resort:** Median (numeric) or Mode (categorical)")
             
-            with st.expander("💡 Why This Matters"):
+            with st.expander("Why This Matters"):
                 st.markdown("""
                 If any NaN values remain after all previous steps, this guarantees 
                 100% completeness by filling with simple statistics.
@@ -231,9 +231,9 @@ df['LengthofLutealPhase'] = df[['LengthofLutealPhase', 'LengthofCycle']].min(axi
                 """)
         
         with tabs[3]:
-            st.subheader("✅ Validation & Quality Checks")
+            st.subheader("Validation & Quality Checks")
             
-            st.markdown("### 📊 Distribution Comparison")
+            st.markdown("### Distribution Comparison")
             st.info("Compare original vs. imputed distributions to ensure consistency")
             
             with st.expander("View Validation Steps"):
@@ -246,7 +246,7 @@ df['LengthofLutealPhase'] = df[['LengthofLutealPhase', 'LengthofCycle']].min(axi
                 """)
             
             st.markdown("---")
-            st.markdown("### 🔍 Key Relationship Analysis")
+            st.markdown("### Key Relationship Analysis")
             st.success("**Example:** MeanCycleLength vs. EstimatedDayofOvulation")
             
             st.markdown("""
@@ -260,10 +260,10 @@ df['LengthofLutealPhase'] = df[['LengthofLutealPhase', 'LengthofCycle']].min(axi
     # ==================== HORMONES + SYMPTOMS ====================
     elif dataset == "Hormones + Symptoms":
         tabs = st.tabs([
-            "📋 Overview",
-            "🔢 Encoding",
-            "🧹 Preparation",
-            "🔄 Imputation"
+            "Overview",
+            "Encoding",
+            "Preparation",
+            "Imputation"
         ])
         
         with tabs[0]:
@@ -283,7 +283,7 @@ df['LengthofLutealPhase'] = df[['LengthofLutealPhase', 'LengthofCycle']].min(axi
             symptoms were often not recorded. Missingness is related to testing method.
             """)
             
-            st.markdown("### 🎯 Pipeline Flow")
+            st.markdown("### Pipeline Flow")
             st.code("""
 Step 1: Ordinal Encoding
 ├── Menstrual phases (1-4)
@@ -304,7 +304,7 @@ Step 4: Validation
             """, language="text")
         
         with tabs[1]:
-            st.subheader("🔢 Step 1: Ordinal Encoding")
+            st.subheader("Step 1: Ordinal Encoding")
             
             st.markdown("### Menstrual Phase Encoding")
             st.code("""
@@ -355,7 +355,7 @@ df['headaches_encoded'] = df['headaches'].map(symptom_mapping)
             """)
         
         with tabs[2]:
-            st.subheader("🧹 Step 2: Data Preparation")
+            st.subheader("Step 2: Data Preparation")
             
             st.warning("""
             **MNAR Observed:** Days when PDG was measured often lack symptom data.
@@ -396,7 +396,7 @@ imputation_cols = [col for col in numeric_cols if col != 'pdg']
                 """, language="python")
         
         with tabs[3]:
-            st.subheader("🔄 Step 3: Per-User Imputation")
+            st.subheader("Step 3: Per-User Imputation")
             
             st.info("""
             **Strategy:** Impute within each participant to maintain individual consistency.
@@ -408,7 +408,7 @@ imputation_cols = [col for col in numeric_cols if col != 'pdg']
             col1, col2 = st.columns(2)
             
             with col1:
-                st.markdown("#### 📊 Few Records (<3)")
+                st.markdown("#### Few Records (<3)")
                 st.code("""
 Method: Mean Imputation
 
@@ -418,7 +418,7 @@ user_data.fillna(participant_mean)
                 st.caption("Simple and stable for limited data")
             
             with col2:
-                st.markdown("#### 🌳 Sufficient Records (≥3)")
+                st.markdown("#### Sufficient Records (≥3)")
                 st.code("""
 Method: Iterative Imputer
 Estimator: Random Forest
@@ -434,7 +434,7 @@ imputer = IterativeImputer(
                 st.caption("Captures non-linear relationships")
             
             st.markdown("---")
-            st.markdown("### 🌳 Why Random Forest?")
+            st.markdown("### Why Random Forest?")
             
             with st.expander("Advantages", expanded=True):
                 st.markdown("""
@@ -444,7 +444,7 @@ imputer = IterativeImputer(
                 4. **Efficient**: Optimized parameters balance accuracy and speed
                 """)
             
-            st.markdown("### ⚙️ Algorithm Parameters")
+            st.markdown("### Algorithm Parameters")
             
             param_col1, param_col2, param_col3 = st.columns(3)
             
@@ -458,7 +458,7 @@ imputer = IterativeImputer(
             st.caption("Parameters optimized for speed while maintaining quality")
             
             st.markdown("---")
-            st.markdown("### 🔄 Complete Implementation")
+            st.markdown("### Complete Implementation")
             
             with st.expander("View Full Code"):
                 st.code("""
@@ -493,7 +493,7 @@ final_df = df.groupby('id').apply(impute_per_user).reset_index(drop=True)
             
             st.markdown("---")
             st.success("""
-            ✅ **Final Outcome:**
+             **Final Outcome:**
             - All missing numeric values imputed per user group
             - Ordinal variables encoded for machine learning
             - Logical consistency maintained across all steps
@@ -503,12 +503,12 @@ final_df = df.groupby('id').apply(impute_per_user).reset_index(drop=True)
     # ==================== HEART RATE MERGED ====================
     else:
         tabs = st.tabs([
-            "📋 Overview",
-            "💓 HR Loading",
-            "📊 Aggregation",
-            "❌ Missingness",
-            "🔧 Imputation",
-            "🔗 Merging"
+            "Overview",
+            "HR Loading",
+            "Aggregation",
+            "Missingness",
+            "Imputation",
+            "Merging"
         ])
         
         with tabs[0]:
@@ -528,7 +528,7 @@ final_df = df.groupby('id').apply(impute_per_user).reset_index(drop=True)
                 st.metric("Memory Savings", "80-90%")
             
             st.markdown("---")
-            st.markdown("### 🎯 Pipeline Overview")
+            st.markdown("### Pipeline Overview")
             st.code("""
 Step 1: Optimized HR Loading
 ├── Load in 100k row chunks
@@ -556,12 +556,12 @@ Step 5: Merge with Hormones
             """, language="text")
         
         with tabs[1]:
-            st.subheader("💓 Step 1: Heart Rate Loading Process")
+            st.subheader("Step 1: Heart Rate Loading Process")
             
             st.error("**Problem:** Hundreds of thousands of rows per participant")
             st.success("**Solution:** Chunk-based filtered loading")
             
-            st.markdown("### 🔍 Filtering Before Loading")
+            st.markdown("### Filtering Before Loading")
             
             with st.expander("Why Filter First?", expanded=True):
                 st.markdown("""
@@ -573,7 +573,7 @@ Step 5: Merge with Hormones
                 **Result:** Only load necessary data, reducing memory by 80-90%
                 """)
             
-            st.markdown("### ✅ Filtering Criteria")
+            st.markdown("### Filtering Criteria")
             
             col1, col2 = st.columns(2)
             with col1:
@@ -590,7 +590,7 @@ Step 5: Merge with Hormones
                 """)
             
             st.markdown("---")
-            st.markdown("### 🧭 Processing Steps")
+            st.markdown("### Processing Steps")
             
             with st.expander("View Implementation", expanded=True):
                 st.code("""
@@ -624,7 +624,7 @@ hr_df = pd.concat(chunks, ignore_index=True)
                 """, language="python")
             
             st.markdown("---")
-            st.markdown("### 💾 Memory Optimization")
+            st.markdown("### Memory Optimization")
             
             opt_col1, opt_col2 = st.columns(2)
             
@@ -651,11 +651,11 @@ hr_df['id'] = hr_df['id'].astype('int32')
             """, language="python")
         
         with tabs[2]:
-            st.subheader("📊 Step 2: Aggregating Heart Rate (Daily)")
+            st.subheader("Step 2: Aggregating Heart Rate (Daily)")
             
             st.info("Original HR dataset may have many readings per day (every minute)")
             
-            st.markdown("### 🎯 Aggregation Strategy")
+            st.markdown("### Aggregation Strategy")
             st.success("Aggregate per participant, per day into summary statistics")
             
             col1, col2 = st.columns(2)
@@ -681,7 +681,7 @@ hr_df['id'] = hr_df['id'].astype('int32')
                 """)
             
             st.markdown("---")
-            st.markdown("### 💻 Implementation")
+            st.markdown("### Implementation")
             
             with st.expander("View Aggregation Code", expanded=True):
                 st.code("""
@@ -701,7 +701,7 @@ hr_daily.columns = [
 # 1  | 5           | 72.3    | 8.5    | 58     | 95     | 1423
                 """, language="python")
             
-            st.markdown("### 📈 Example Transformation")
+            st.markdown("### Example Transformation")
             
             st.markdown("**Before Aggregation:**")
             st.code("""
@@ -719,11 +719,11 @@ id | day_in_study | hr_mean | hr_std | hr_min | hr_max | hr_count
             """, language="text")
         
         with tabs[3]:
-            st.subheader("❌ Step 3: Introducing Realistic Missingness")
+            st.subheader("Step 3: Introducing Realistic Missingness")
             
             st.warning("**Purpose:** Simulate real-world missing data patterns (15% total)")
             
-            st.markdown("### 🎲 Missingness Patterns")
+            st.markdown("### Missingness Patterns")
             
             pattern_tabs = st.tabs([
                 "Random",
@@ -733,7 +733,7 @@ id | day_in_study | hr_mean | hr_std | hr_min | hr_max | hr_count
             ])
             
             with pattern_tabs[0]:
-                st.markdown("#### 🎯 Random Missing")
+                st.markdown("#### Random Missing")
                 st.info("Simulates: General device issues, random sensor failures")
                 st.code("""
 # Random 5% missingness
@@ -742,7 +742,7 @@ hr_daily.loc[random_mask, 'hr_mean'] = np.nan
                 """, language="python")
             
             with pattern_tabs[1]:
-                st.markdown("#### 👤 Participant-Biased Missing")
+                st.markdown("#### Participant-Biased Missing")
                 st.info("Simulates: Some participants forget to wear device more often")
                 st.code("""
 # Select 20% of participants
@@ -758,7 +758,7 @@ for pid in biased_participants:
                 """, language="python")
             
             with pattern_tabs[2]:
-                st.markdown("#### 🌙 Time-Dependent Missing")
+                st.markdown("#### Time-Dependent Missing")
                 st.info("Simulates: Sensor issues at night, not wearing device")
                 st.code("""
 # Higher missingness for certain day ranges
@@ -770,7 +770,7 @@ hr_daily.loc[night_mask & random_night, 'hr_mean'] = np.nan
                 """, language="python")
             
             with pattern_tabs[3]:
-                st.markdown("#### 📦 Block Missing (Multi-Day)")
+                st.markdown("#### Block Missing (Multi-Day)")
                 st.info("Simulates: Device off for multiple consecutive days")
                 st.code("""
 # Create 3-5 day missing blocks
@@ -791,7 +791,7 @@ for participant in some_participants:
             st.success("**Result:** Realistic missing data that mimics real Fitbit/MCPhases behavior")
         
         with tabs[4]:
-            st.subheader("🔧 Step 4: Time-Series Imputation")
+            st.subheader("Step 4: Time-Series Imputation")
             
             st.info("Advanced multi-step algorithm for smooth, realistic HR curves")
             
@@ -803,7 +803,7 @@ for participant in some_participants:
             ])
             
             with imputation_steps[0]:
-                st.markdown("### 📈 Trend Estimation")
+                st.markdown("### Trend Estimation")
                 st.markdown("""
                 Captures long-term HR changes over the study period.
                 
@@ -821,7 +821,7 @@ hr_daily['hr_trend'] = (
                 st.info("This smooths out day-to-day variations to reveal underlying patterns")
             
             with imputation_steps[1]:
-                st.markdown("### 📅 Weekly Seasonality")
+                st.markdown("### Weekly Seasonality")
                 st.markdown("""
                 Captures biological rhythms (sleep/wake cycles, weekly patterns).
                 
@@ -838,7 +838,7 @@ hr_daily['hr_seasonal'] = weekly_pattern
                 st.success("People often have consistent patterns on the same day of the week")
             
             with imputation_steps[2]:
-                st.markdown("### 🔗 Linear Interpolation")
+                st.markdown("### Linear Interpolation")
                 st.markdown("""
                 Fills gaps between known values with smooth transitions.
                 
@@ -856,7 +856,7 @@ hr_daily['hr_interpolated'] = (
                 st.info("Creates smooth curves between data points rather than sharp jumps")
             
             with imputation_steps[3]:
-                st.markdown("### 🔄 Final Fallback Mean")
+                st.markdown("### Final Fallback Mean")
                 st.markdown("""
                 Only used if a participant has too few HR records for other methods.
                 
@@ -891,11 +891,11 @@ for participant_id in hr_daily['id'].unique():
             """)
         
         with tabs[5]:
-            st.subheader("🔗 Step 5: Merging Heart Rate with Hormones")
+            st.subheader("Step 5: Merging Heart Rate with Hormones")
             
             st.info("After cleaning HR data, merge it with hormone/symptom dataset")
             
-            st.markdown("### 🔑 Merge Key")
+            st.markdown("### Merge Key")
             
             col1, col2 = st.columns(2)
             
@@ -913,7 +913,7 @@ Type: Inner join
                 """, language="text")
             
             st.markdown("---")
-            st.markdown("### 💻 Implementation")
+            st.markdown("### Implementation")
             
             with st.expander("View Merge Code", expanded=True):
                 st.code("""
@@ -932,7 +932,7 @@ print(f"Merged records: {len(merged_df)}")
                 """, language="python")
             
             st.markdown("---")
-            st.markdown("### ⚡ Merged Dataset Contains")
+            st.markdown("### Merged Dataset Contains")
             
             content_tabs = st.tabs([
                 "HR Metrics",
@@ -979,7 +979,7 @@ print(f"Merged records: {len(merged_df)}")
                 """)
             
             st.markdown("---")
-            st.markdown("### 🎯 Use Cases")
+            st.markdown("### Use Cases")
             
             use_col1, use_col2 = st.columns(2)
             
@@ -1000,14 +1000,14 @@ print(f"Merged records: {len(merged_df)}")
                 """)
             
             st.markdown("---")
-            st.markdown("### 💾 Output File")
+            st.markdown("### Output File")
             
             st.code("""
 final_merged_hr_hormones.csv
             """, language="text")
             
             st.success("""
-            ✅ **Complete Dataset Ready For:**
+             **Complete Dataset Ready For:**
             - Machine learning model training
             - Statistical analysis
             - Visualization
