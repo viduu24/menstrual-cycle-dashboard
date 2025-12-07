@@ -1,66 +1,78 @@
 import streamlit as st
 
-# Test imports one by one
-try:
-    from utils.data_loader import load_data, load_models
-    st.success("✅ utils.data_loader imported successfully")
-except Exception as e:
-    st.error(f"❌ Error importing utils.data_loader: {e}")
+# Fix Python path
+import sys, os
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+PARENT_DIR = os.path.dirname(CURRENT_DIR)
+sys.path.append(PARENT_DIR)
+sys.path.append(CURRENT_DIR)
 
-try:
-    from pages import page_readme
-    st.success("✅ page_readme imported successfully")
-except Exception as e:
-    st.error(f"❌ Error importing page_readme: {e}")
+# Correct imports for package layout
+from Menstrual_cycle_dashboard.utils.data_loader import load_data, load_models
+from Menstrual_cycle_dashboard.app_pages import (
+    page_readme,
+    page_data_description,
+    page_missingness,
+    page_cleaning,
+    page_information,
+    page_graphs,
+    page_ml_models,
+    page_guide,
+    page_predictions
+)
 
-try:
-    from pages import page_data_description
-    st.success("✅ page_data_description imported successfully")
-except Exception as e:
-    st.error(f"❌ Error importing page_data_description: {e}")
+# Configure page
+st.set_page_config(
+    page_title="Menstrual Cycle Dashboard",
+    page_icon="🩸",
+    layout="wide"
+)
 
-try:
-    from pages import page_missingness
-    st.success("✅ page_missingness imported successfully")
-except Exception as e:
-    st.error(f"❌ Error importing page_missingness: {e}")
+# Load data and models once
+period_1, period_2, period_3 = load_data()
+models = load_models()
 
-try:
-    from pages import page_cleaning
-    st.success("✅ page_cleaning imported successfully")
-except Exception as e:
-    st.error(f"❌ Error importing page_cleaning: {e}")
+# Sidebar Navigation
+st.sidebar.title("🩸 Menstrual Cycle Dashboard")
+page = st.sidebar.radio(
+    "Go to", 
+    [
+        "README",
+        "Data Description",
+        "Missingness",
+        "Cleaning Process",
+        "Information",
+        "Graphs",
+        "ML models",
+        "Guide on using the predictions feature",
+        "Predictions"
+    ]
+)
 
-try:
-    from pages import page_information
-    st.success("✅ page_information imported successfully")
-except Exception as e:
-    st.error(f"❌ Error importing page_information: {e}")
-
-try:
-    from pages import page_graphs
-    st.success("✅ page_graphs imported successfully")
-except Exception as e:
-    st.error(f"❌ Error importing page_graphs: {e}")
-
-try:
-    from pages import page_ml_models
-    st.success("✅ page_ml_models imported successfully")
-except Exception as e:
-    st.error(f"❌ Error importing page_ml_models: {e}")
-
-try:
-    from pages import page_guide
-    st.success("✅ page_guide imported successfully")
-except Exception as e:
-    st.error(f"❌ Error importing page_guide: {e}")
-
-try:
-    from pages import page_predictions
-    st.success("✅ page_predictions imported successfully")
-except Exception as e:
-    st.error(f"❌ Error importing page_predictions: {e}")
-
-st.markdown("---")
-st.markdown("### If all imports are ✅, replace app.py with the fixed version")
-st.markdown("### If any imports show ❌, that page file has an error")
+# Route to appropriate page
+if page == "README":
+    page_readme.show()
+    
+elif page == "Data Description":
+    page_data_description.show(period_1, period_2, period_3)
+    
+elif page == "Missingness":
+    page_missingness.show()
+    
+elif page == "Cleaning Process":
+    page_cleaning.show()
+    
+elif page == "Information":
+    page_information.show()
+    
+elif page == "Graphs":
+    page_graphs.show(period_1, period_2, period_3)
+    
+elif page == "ML models":
+    page_ml_models.show()
+    
+elif page == "Guide on using the predictions feature":
+    page_guide.show()
+    
+elif page == "Predictions":
+    page_predictions.show(models)

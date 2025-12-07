@@ -5,8 +5,9 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import plotly.express as px
 import os
-from utils.helpers import decode_phase
-from utils.visualization import MenstrualCycleVisualizer
+from Menstrual_cycle_dashboard.utils.data_loader import load_data
+from Menstrual_cycle_dashboard.utils.visualization import MenstrualCycleVisualizer
+
 
 def show(period_1, period_2, period_3):
     dataset = st.selectbox(
