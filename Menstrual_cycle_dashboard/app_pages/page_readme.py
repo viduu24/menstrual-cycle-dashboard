@@ -1,9 +1,10 @@
 import streamlit as st
 
 def show():
-    st.title("🌸 Menstrual Cycle Analysis Dashboard")
+    st.title("<div style="text-align: center;">
+    🌸 Menstrual Cycle Analysis Dashboard")
     st.markdown("""
-
+<div style="text-align: center;">
 
 This interactive dashboard helps users explore menstrual cycle patterns using real-world datasets.  
 It is designed especially for people who **are new to menstrual health** and want to understand how  
