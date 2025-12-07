@@ -1,4 +1,7 @@
-st.markdown("### 🌺 Understanding the Menstrual Cycle")
+import streamlit as st
+
+def show():
+    st.markdown("### 🌺 Understanding the Menstrual Cycle")
 
 st.markdown("""
 <div style='text-align: justify;'>
