@@ -6,7 +6,7 @@ def show():
     """, unsafe_allow_html=True)
 
     st.markdown("""
-<div style="text-align: center;">
+<div style="text-align: justify;">
 
 This interactive dashboard helps users explore menstrual cycle patterns using real-world datasets.  
 It is designed especially for people who **are new to menstrual health** and want to understand how  
