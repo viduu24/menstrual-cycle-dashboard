@@ -49,11 +49,11 @@ def show(period_1, period_2, period_3):
         """)
     
     # Summary statistics
-    st.subheader(" Statistical Summary (Numerical Columns)")
+    st.subheader("Statistical Summary (Numerical Columns)")
     st.write(df.describe())
     
     # Categorical summary
-    st.subheader("🗂 Categorical Columns Breakdown")
+    st.subheader("Categorical Columns Breakdown")
     categorical_cols = df.select_dtypes(include=['object', 'category']).columns
     
     if len(categorical_cols) > 0:
