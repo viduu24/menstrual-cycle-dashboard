@@ -75,8 +75,8 @@ def show(period_1, period_2, period_3):
     # 2️⃣ PERIOD 2 — Counts of each Phase (already available)
     elif dataset.startswith("Period 2"):
         if "phase" in df.columns:
-            st.markdown("### 🔹 Distribution of Cycle Phases")
-            phase_counts = df["phase"].value_counts().reset_index()
+            st.markdown("### Distribution of Cycle Phases")
+            phase_counts = df["phase_encoded"].value_counts().reset_index()
             phase_counts.columns = ["phase_encoded", "count"]
 
             fig = px.bar(
@@ -99,7 +99,7 @@ def show(period_1, period_2, period_3):
         
         if len(hr_cols) > 0:
             hr_col = hr_cols[0]  # use first HR-related column
-            st.markdown(f"### 🔹 Heart Rate Overview — **{hr_col}**")
+            st.markdown(f"### Heart Rate Overview — **{hr_col}**")
 
             fig = px.histogram(
                 df,
