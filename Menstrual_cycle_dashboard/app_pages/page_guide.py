@@ -1,3 +1,5 @@
+import streamlit as st
+
 def show_guide():
     st.header("📝 Input Recommendations for Accurate Predictions")
     
@@ -42,3 +44,8 @@ def show_guide():
 | 2 | Medium flow |
 | 3 | Heavy bleeding |
         """)
+
+# REQUIRED wrapper so your app router can call page_guide.show()
+def show():
+    show_guide()
+
