@@ -48,19 +48,19 @@ def show(period_1, period_2, period_3):
     # ----------------------------------------------------------
     # 🔢 STATISTICAL SUMMARY
     # ----------------------------------------------------------
-    st.subheader("📈 Statistical Summary (Numerical Columns)")
+    st.subheader("Statistical Summary (Numerical Columns)")
     st.write(df.describe())
 
     # ----------------------------------------------------------
     # 📊 DATASET-SPECIFIC VISUALIZATIONS
     # ----------------------------------------------------------
     st.markdown("---")
-    st.subheader("📊 Key Visualizations")
+    
 
     # 1️⃣ PERIOD 1 — Circular plot of Length of Menses
     if dataset.startswith("Period 1"):
         if "LengthofMenses" in df.columns:
-            st.markdown("### 🔹 Distribution of Length of Menses (Circular Plot)")
+            st.markdown("### 🔹 Distribution of Length of Menses (in days)")
             fig = px.pie(
                 df,
                 names="LengthofMenses",
@@ -77,7 +77,7 @@ def show(period_1, period_2, period_3):
         if "phase" in df.columns:
             st.markdown("### 🔹 Distribution of Cycle Phases")
             phase_counts = df["phase"].value_counts().reset_index()
-            phase_counts.columns = ["phase", "count"]
+            phase_counts.columns = ["phase_encoded", "count"]
 
             fig = px.bar(
                 phase_counts,
