@@ -14,10 +14,12 @@ The goal is to make menstrual health more understandable for everyone, especiall
 
 ---
 
-### 🔍 **Next Steps**
+### **Next Steps**
 Use the sidebar to:
-
-- View cleaned datasets with summary statistics  
+- View data description with summary statistics
+- Missing values in the raw dataset
+- Imputation of missing values in the dataset
+- Information about each phase of the cycle
 - Explore visualizations showing hormone patterns, heart-rate changes, and symptom trends   
 - Try out machine-learning powered predictions for cycle phase and cycle length  
 
