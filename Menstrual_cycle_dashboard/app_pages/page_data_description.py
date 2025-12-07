@@ -2,7 +2,7 @@ import streamlit as st
 import plotly.express as px
 
 def show(period_1, period_2, period_3):
-    st.header("📄 Dataset Overview")
+    st.header("Dataset Overview")
     
     dataset = st.selectbox(
         "Select a dataset to view:",
@@ -41,7 +41,7 @@ def show(period_1, period_2, period_3):
     else:
         st.markdown("""
             ###  About Merged Dataset
-            - Combination of PhysioNet + Hormones + Symptoms  
+            - Combination of Heart rate + Hormones + Symptoms  
             - Used for all **Machine Learning models**  
             - Contains engineered features such as:  
             - **hr_rolling_7d**, **phase_lag1_enc**, **estrogen_delta1**,  
@@ -64,7 +64,7 @@ def show(period_1, period_2, period_3):
         st.write("No categorical columns found in this dataset.")
     
     # Initial visualizations
-    st.subheader("📊 Exploratory Visualizations")
+    st.subheader("Exploratory Visualizations")
     
     numeric_cols = df.select_dtypes(include=['int64', 'float64']).columns
     
