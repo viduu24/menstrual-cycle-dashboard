@@ -1,3 +1,7 @@
+import streamlit as st
+import pandas as pd
+import joblib
+import os
 def show_predictions(models):
     st.title("🤖 Machine Learning Models")
     st.markdown("Explore predictions from your trained ML models — Phase & Cycle Length.")
@@ -56,3 +60,5 @@ def show_predictions(models):
             pred = m3_model.predict(X_scaled)[0]
             
             st.success(f"### 📏 Predicted Cycle Length: **{pred:.1f} days**")
+def show(models):
+    show_predictions(models)
