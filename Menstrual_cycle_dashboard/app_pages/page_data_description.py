@@ -59,7 +59,7 @@ def show(period_1, period_2, period_3):
     # ----------------------------------------------------------
     # STATISTICAL SUMMARY
     # ----------------------------------------------------------
-    st.subheader("📈 Statistical Summary")
+    st.subheader(" Statistical Summary")
     st.write(df.describe())
 
     st.markdown("---")
