@@ -12,9 +12,10 @@ from Menstrual_cycle_dashboard.utils.data_loader import load_data, load_models
 from Menstrual_cycle_dashboard.app_pages import (
     page_readme,
     page_data_description,
+    page_information,
     page_missingness,
     page_cleaning,
-    page_information,
+    
     page_graphs,
     page_ml_models,
     page_guide,
@@ -38,10 +39,10 @@ page = st.sidebar.radio(
     "Go to", 
     [
         "README",
+        "Information about phases",
         "Data Description",
         "Missingness",
         "Cleaning Process",
-        "Information",
         "Graphs",
         "ML models",
         "Guide on using the predictions feature",
@@ -53,6 +54,9 @@ page = st.sidebar.radio(
 if page == "README":
     page_readme.show()
     
+elif page == "Information about phases":
+    page_information.show()
+    
 elif page == "Data Description":
     page_data_description.show(period_1, period_2, period_3)
     
@@ -61,9 +65,6 @@ elif page == "Missingness":
     
 elif page == "Cleaning Process":
     page_cleaning.show()
-    
-elif page == "Information":
-    page_information.show()
     
 elif page == "Graphs":
     page_graphs.show(period_1, period_2, period_3)
