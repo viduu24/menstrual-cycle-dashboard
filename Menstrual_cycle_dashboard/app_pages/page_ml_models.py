@@ -7,7 +7,7 @@ def show():
     used in the Menstrual Cycle Dashboard.
     """
     
-    st.title("🤖 Machine Learning Models")
+    st.title("Machine Learning Models")
     st.markdown("---")
     
     # Introduction
@@ -31,13 +31,13 @@ def show():
         col1, col2 = st.columns([2, 1])
         
         with col1:
-            st.subheader("📋 Overview")
+            st.subheader("Overview")
             st.markdown("""
             Identifies which phase of your menstrual cycle you're currently in based on 
             physiological measurements and hormone levels.
             """)
             
-            st.subheader("🎯 Purpose")
+            st.subheader("Purpose")
             st.markdown("""
             - Accurately identify current cycle phase
             - Understand phase-specific symptoms and patterns
@@ -45,7 +45,7 @@ def show():
             - Track cycle regularity over time
             """)
             
-            st.subheader("📊 Model Details")
+            st.subheader("Model Details")
             st.markdown("""
             - **Algorithm**: XGBoost Classifier
             - **Parameters**: 180 trees, learning rate 0.12
@@ -59,7 +59,7 @@ def show():
             st.metric("Classes", "4")
             st.metric("Accuracy", "High")
         
-        st.subheader("🔍 Input Features (Simplified)")
+        st.subheader(" Input Features (Simplified)")
         features_m2 = pd.DataFrame({
             'Feature': [
                 'cycle_day',
@@ -100,9 +100,9 @@ def show():
         })
         st.dataframe(features_m2, use_container_width=True, hide_index=True)
         
-        st.success("✅ **User-Friendly**: Only 5 inputs needed! (cycle_day, estrogen, pdg, lh, hr_mean)")
+        st.success("**User-Friendly**: Only 5 inputs needed! (cycle_day, estrogen, pdg, lh, hr_mean)")
         
-        st.subheader("🏷️ Predicted Phases")
+        st.subheader(" Predicted Phases")
         phases = pd.DataFrame({
             'Phase': ['Follicular', 'Fertility', 'Luteal', 'Menstrual'],
             'Timing': ['Days 1-13', 'Days 14-17', 'Days 18-28', 'Days 1-5'],
@@ -119,19 +119,19 @@ def show():
     # MODEL 2: CYCLE LENGTH PREDICTION
     # ====================================================================
     with tab2:
-        st.header("📅 Model 3: Cycle Length Prediction")
+        st.header(" Model 3: Cycle Length Prediction")
         
         col1, col2 = st.columns([2, 1])
         
         with col1:
-            st.subheader("📋 Overview")
+            st.subheader("Overview")
             st.markdown("""
             Predicts the total length of your menstrual cycle based on demographic 
             information and menstrual characteristics. Helps you anticipate when 
             your next period will begin.
             """)
             
-            st.subheader("🎯 Purpose")
+            st.subheader("Purpose")
             st.markdown("""
             - Predict next period start date
             - Understand cycle regularity patterns
@@ -139,7 +139,7 @@ def show():
             - Plan ahead for important events
             """)
             
-            st.subheader("📊 Model Details")
+            st.subheader("Model Details")
             st.markdown("""
             - **Algorithm**: Random Forest Regressor
             - **Parameters**: 200 trees, max depth 10
@@ -152,7 +152,7 @@ def show():
             st.metric("Trees", "200")
             st.metric("Max Depth", "10")
         
-        st.subheader("🔍 Input Features (No Data Leakage)")
+        st.subheader("Input Features (No Data Leakage)")
         features_m3 = pd.DataFrame({
             'Feature': [
                 'Age',
@@ -187,9 +187,9 @@ def show():
         })
         st.dataframe(features_m3, use_container_width=True, hide_index=True)
         
-        st.warning("⚠️ **Excluded Features**: We carefully removed features that would leak the answer (e.g., MeanCycleLength, LengthofLutealPhase) to ensure honest predictions.")
+        st.warning("**Excluded Features**: We carefully removed features that would leak the answer (e.g., MeanCycleLength, LengthofLutealPhase) to ensure honest predictions.")
         
-        st.subheader("📈 Typical Cycle Lengths")
+        st.subheader("Typical Cycle Lengths")
         st.markdown("""
         - **Short**: 21-24 days
         - **Normal**: 25-30 days (most common)
@@ -201,7 +201,7 @@ def show():
     # COMPARISON SECTION
     # ====================================================================
     st.markdown("---")
-    st.header("📊 Model Comparison")
+    st.header("Model Comparison")
     
     comparison_df = pd.DataFrame({
         'Model': ['Model 2: Phase', 'Model 3: Cycle Length'],
@@ -218,12 +218,12 @@ def show():
     # HOW TO USE
     # ====================================================================
     st.markdown("---")
-    st.header("🚀 How to Use These Models")
+    st.header("How to Use These Models")
     
     col1, col2, col3 = st.columns(3)
     
     with col1:
-        st.subheader("1️⃣ Gather Data")
+        st.subheader("Gather Data")
         st.markdown("""
         - Track your cycle day
         - Measure hormone levels (if available)
@@ -232,7 +232,7 @@ def show():
         """)
     
     with col2:
-        st.subheader("2️⃣ Make Predictions")
+        st.subheader("Make Predictions")
         st.markdown("""
         - Navigate to Predictions page
         - Enter required values
@@ -241,7 +241,7 @@ def show():
         """)
     
     with col3:
-        st.subheader("3️⃣ Understand Results")
+        st.subheader("Understand Results")
         st.markdown("""
         - Review prediction confidence
         - Compare with historical data
@@ -253,7 +253,7 @@ def show():
     # TECHNICAL DETAILS
     # ====================================================================
     st.markdown("---")
-    with st.expander("🔬 Technical Details & Training Info"):
+    with st.expander("Technical Details & Training Info"):
         st.subheader("Training Process")
         st.markdown("""
         All models were trained using scikit-learn 1.3.2 and XGBoost with the following considerations:
