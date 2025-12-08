@@ -298,18 +298,4 @@ def show():
         └── model3_features.pkl            # Feature list
         """)
     
-    # ====================================================================
-    # DISCLAIMER
-    # ====================================================================
-    st.markdown("---")
-    st.error("""
-    ⚠️ **Medical Disclaimer**: These models are for educational and informational purposes only. 
-    They are not intended to diagnose, treat, cure, or prevent any disease. Always consult 
-    with a qualified healthcare provider for medical advice and before making any decisions 
-    regarding your health.
-    """)
-    
-    st.info("""
-    💡 **Tip**: For best results, use these models in combination with each other and track 
-    your data consistently over multiple cycles. Patterns become clearer with more data!
-    """)
+   
