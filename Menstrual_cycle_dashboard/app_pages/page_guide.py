@@ -1,12 +1,12 @@
 import streamlit as st
 
 def show_guide():
-    st.header("📝 Input Recommendations for Accurate Predictions")
+    st.header("Input Recommendations for Accurate Predictions")
     
-    tab1, tab2 = st.tabs(["📌 Phase Prediction Inputs", "📅 Cycle Length Prediction Inputs"])
+    tab1, tab2 = st.tabs(["Phase Prediction Inputs", "Cycle Length Prediction Inputs"])
     
     with tab1:
-        st.subheader("📌 Recommended Input Ranges — Phase Prediction")
+        st.subheader("Recommended Input Ranges — Phase Prediction")
         st.markdown("""
 ### 🧪 **Hormones**
 | Hormone | Follicular | Fertility | Luteal | Notes |
@@ -18,7 +18,7 @@ def show_guide():
 ### ⏳ **Cycle Day**
 - Range: **1–28**
 
-### ❤️ **Heart Rate Inputs**
+### **Heart Rate Inputs**
 | Metric | Typical Range |
 |--------|---------------|
 | **Mean HR (bpm)** | 55–95 bpm |
@@ -27,16 +27,16 @@ def show_guide():
         """)
     
     with tab2:
-        st.subheader("📅 Recommended Input Ranges — Cycle Length Prediction")
+        st.subheader("Recommended Input Ranges — Cycle Length Prediction")
         st.markdown("""
-### 🔢 **Cycle Length (Prior Cycles)**
+###  **Cycle Length (Prior Cycles)**
 - Enter **1–3 past cycle lengths**
 - Typical: **24–35 days**
 
-### 🩸 **Mean Menses Length**
+### **Mean Menses Length**
 - Typical: **3–7 days**
 
-### 📊 **Daily Menses Scores**
+###  **Daily Menses Scores**
 | Value | Meaning |
 |-------|---------|
 | 0 | No bleeding |
