@@ -358,29 +358,107 @@ From this line chart we can tell that the maximum bleeding is on day 2 of period
                     "HR + Hormone Timeseries",
                     "Correlation Heatmap",
                     "Heart Rate Variability (HRV)",
-                    "Participant Comparison"
+                    "Participant Comparison",
+                    "Phase Statistics"
                 ]
             )
         
         if plot_type == "Heart Rate by Cycle Phase":
-            viz.plot_hr_by_cycle_phase(save_path="merged_hr_by_phase.png")
-            st.image("merged_hr_by_phase.png")
+            st.subheader("📊 Heart Rate by Cycle Phase")
+            chart = viz.plot_hr_by_cycle_phase()
+            if chart:
+                st.altair_chart(chart, use_container_width=True)
+                st.markdown("""
+                This box plot shows the distribution of heart rate across different menstrual cycle phases. 
+                Each box represents the interquartile range (IQR), with the line inside showing the median heart rate.
+                """)
+            else:
+                st.warning("Unable to generate chart - check data format")
         
         elif plot_type == "HR + Hormone Timeseries":
-            viz.plot_hr_hormone_timeseries(save_path="merged_hr_hormone_timeseries.png")
-            st.image("merged_hr_hormone_timeseries.png")
+            st.subheader("📊 Heart Rate & Hormone Time Series")
+            
+            # Get available participants
+            available_participants = viz.df['id'].unique()
+            
+            if len(available_participants) > 1:
+                selected_participant = st.selectbox(
+                    "Select Participant:",
+                    available_participants
+                )
+            else:
+                selected_participant = available_participants[0]
+            
+            chart = viz.plot_hr_hormone_timeseries(participant_id=selected_participant)
+            if chart:
+                st.altair_chart(chart, use_container_width=True)
+                st.markdown("""
+                This time series visualization shows how heart rate and hormone levels change over time 
+                for an individual participant. The synchronized patterns can reveal relationships between 
+                physiological measurements and hormonal fluctuations.
+                """)
+            else:
+                st.warning("Unable to generate chart - check data format")
         
         elif plot_type == "Correlation Heatmap":
-            viz.plot_correlation_matrix(save_path="merged_corr_heatmap.png")
-            st.image("merged_corr_heatmap.png")
+            st.subheader("📊 Correlation Matrix: HR & Hormones")
+            chart = viz.plot_correlation_matrix()
+            if chart:
+                st.altair_chart(chart, use_container_width=True)
+                st.markdown("""
+                This heatmap displays correlations between heart rate metrics and hormone levels. 
+                Values closer to 1 (red) indicate strong positive correlation, while values closer to -1 (blue) 
+                indicate strong negative correlation. Values near 0 suggest little to no linear relationship.
+                """)
+            else:
+                st.warning("Unable to generate chart - check data format")
         
         elif plot_type == "Heart Rate Variability (HRV)":
-            viz.plot_hrv_analysis(save_path="merged_hrv.png")
-            st.image("merged_hrv.png")
+            st.subheader("📊 Heart Rate Variability Analysis")
+            chart = viz.plot_hrv_analysis()
+            if chart:
+                st.altair_chart(chart, use_container_width=True)
+                st.markdown("""
+                Heart Rate Variability (HRV) is a measure of variation in time between heartbeats. 
+                Higher HRV is generally associated with better cardiovascular health and stress resilience. 
+                The visualization shows the distribution of HRV and how it changes over time.
+                """)
+            else:
+                st.warning("Unable to generate chart - check data format")
         
         elif plot_type == "Participant Comparison":
-            viz.plot_participant_comparison(save_path="merged_participants.png")
-            st.image("merged_participants.png")
+            st.subheader("📊 Participant Comparison")
+            
+            n_participants = st.slider(
+                "Number of participants to compare:",
+                min_value=3,
+                max_value=min(12, len(viz.df['id'].unique())),
+                value=6
+            )
+            
+            chart = viz.plot_participant_comparison(n_participants=n_participants)
+            if chart:
+                st.altair_chart(chart, use_container_width=True)
+                st.markdown("""
+                This small multiples visualization allows comparison of heart rate patterns across different 
+                participants. Each panel shows one participant's heart rate trajectory over time, highlighting 
+                inter-individual variability in physiological responses.
+                """)
+            else:
+                st.warning("Unable to generate chart - check data format")
+        
+        elif plot_type == "Phase Statistics":
+            st.subheader("📊 Mean Heart Rate by Phase")
+            chart = viz.plot_phase_statistics()
+            if chart:
+                st.altair_chart(chart, use_container_width=True)
+                st.markdown("""
+                This bar chart shows the average heart rate during each menstrual cycle phase with error bars 
+                representing the standard error of the mean (SEM). This helps identify whether heart rate 
+                significantly differs across cycle phases.
+                """)
+            else:
+                st.warning("Unable to generate chart - check data format")
 
 
 def decode_phase(phase_code):
