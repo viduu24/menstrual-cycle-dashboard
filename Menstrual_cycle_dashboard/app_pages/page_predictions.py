@@ -9,7 +9,7 @@ import os
 # =============================
 def show_predictions():
 
-    st.title("🤖 Machine Learning Models")
+    st.title(" Machine Learning Models")
     st.markdown("Explore predictions from your trained ML models — Phase & Cycle Length.")
 
     base_path = os.path.dirname(os.path.dirname(__file__))
@@ -40,14 +40,14 @@ def show_predictions():
     # -------------------------------
     # TABS
     # -------------------------------
-    tab1, tab2 = st.tabs(["📌 Phase Prediction (Model 2)", "📌 Cycle Length Prediction (Model 3)"])
+    tab1, tab2 = st.tabs([" Phase Prediction (Model 2)", " Cycle Length Prediction (Model 3)"])
 
 
     # =======================================================
     # MODEL 2 — PHASE PREDICTION
     # =======================================================
     with tab1:
-        st.header("📌 Phase Prediction")
+        st.header(" Phase Prediction")
         st.markdown("Enter your values to predict the menstrual cycle phase.")
 
         cycle_day = st.number_input("Cycle Day (1–28)", min_value=1, max_value=28, value=1)
@@ -83,7 +83,7 @@ def show_predictions():
             pred_encoded = m2_model.predict(X_scaled)[0]
             pred_phase = m2_encoder.inverse_transform([pred_encoded])[0]
 
-            st.success(f"### 🎯 Predicted Phase: **{pred_phase}**")
+            st.success(f"###  Predicted Phase: **{pred_phase}**")
 
 
     # =======================================================
