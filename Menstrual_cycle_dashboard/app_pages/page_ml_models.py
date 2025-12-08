@@ -1,7 +1,7 @@
 import streamlit as st
 def show_ml_models():
     st.markdown("""
-# 🤖 Machine Learning Models in This Project
+# Machine Learning Models in This Project
 
 This section explains the machine learning models used in the dashboard, why they were chosen,  
 and how they contribute to understanding menstrual cycle patterns.
@@ -19,27 +19,28 @@ Both models were designed to be:
 
 ---
 
-# 🌙 **Model 2: Phase Prediction (XGBoost)**
+# **Model 1: Phase Prediction (XGBoost)**
 
 This model predicts the phase of the cycle using daily biological indicators.
 
-## 📌 **Why XGBoost?**
+## **Why XGBoost?**
 - Handles non-linear relationships effectively  
 - Performs well even when features have different scales  
 - Compact model files  
 - Captures subtle hormone–cycle interactions  
 
-## 🎯 **Model Performance**
+## **Model Performance**
 - **Training Accuracy:** 0.791  
 - **Macro F1-Score:** 0.787
+- **Balanced Accuracy:** 0.779
 
 ---
 
-# 🩺 **Model 3: Cycle Length Prediction (Random Forest Regression)**
+# **Model 2: Cycle Length Prediction (Random Forest Regression)**
 
 This model predicts the length of a user's cycle based on their symptoms and menstrual flow patterns.
 
-## 🎯 **Model Performance**
+## **Model Performance**
 - **RMSE:** 3.24 days  
 - **MAE:** 2.39 days  
 - **R² Score:** 0.245  
