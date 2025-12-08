@@ -340,125 +340,342 @@ From this line chart we can tell that the maximum bleeding is on day 2 of period
     else:
         st.header("📊 Merged Dataset Visualizations")
         
-        try:
-            base_path = os.path.dirname(os.path.dirname(__file__))
-            viz = MenstrualCycleVisualizer(
-                os.path.join(base_path, "final_merged_hr_hormones.csv")
-            )
-        except Exception as e:
-            st.error(f"❌ Error loading merged dataset: {e}")
-            st.stop()
-        
         with st.sidebar:
             st.subheader("🔍 Choose Visualization (Merged)")
             plot_type = st.radio(
                 "Select a visualization:",
                 [
                     "Heart Rate by Cycle Phase",
-                    "HR + Hormone Timeseries",
-                    "Correlation Heatmap",
-                    "Heart Rate Variability (HRV)",
-                    "Participant Comparison",
-                    "Phase Statistics"
+                    "HR & Hormones Over Time",
+                    "Hormone Levels by Phase",
+                    "Symptoms by Phase",
+                    "Heart Rate Variability",
+                    "HR vs Hormones Correlation"
                 ]
             )
         
+        df_merged = period_3.copy()
+        
+        # 1️⃣ Heart Rate by Cycle Phase
         if plot_type == "Heart Rate by Cycle Phase":
-            st.subheader("📊 Heart Rate by Cycle Phase")
-            chart = viz.plot_hr_by_cycle_phase()
-            if chart:
-                st.altair_chart(chart, use_container_width=True)
-                st.markdown("""
-                This box plot shows the distribution of heart rate across different menstrual cycle phases. 
-                Each box represents the interquartile range (IQR), with the line inside showing the median heart rate.
-                """)
-            else:
-                st.warning("Unable to generate chart - check data format")
-        
-        elif plot_type == "HR + Hormone Timeseries":
-            st.subheader("📊 Heart Rate & Hormone Time Series")
+            st.subheader("📊 Heart Rate Distribution by Cycle Phase")
             
-            # Get available participants
-            available_participants = viz.df['id'].unique()
+            # Map phase_encoded to phase names
+            phase_mapping = {0: 'Follicular', 1: 'Fertility', 2: 'Luteal', 3: 'Menstrual'}
+            df_merged['phase_name'] = df_merged['phase_encoded'].map(phase_mapping)
             
-            if len(available_participants) > 1:
-                selected_participant = st.selectbox(
-                    "Select Participant:",
-                    available_participants
-                )
-            else:
-                selected_participant = available_participants[0]
+            box_plot = alt.Chart(df_merged).mark_boxplot(
+                size=60,
+                opacity=0.7
+            ).encode(
+                x=alt.X('phase_name:N', 
+                       title='Cycle Phase',
+                       sort=['Follicular', 'Fertility', 'Luteal', 'Menstrual']),
+                y=alt.Y('hr_mean:Q', 
+                       title='Heart Rate (bpm)',
+                       scale=alt.Scale(zero=False)),
+                color=alt.Color('phase_name:N', 
+                              scale=alt.Scale(scheme='category10'),
+                              legend=None),
+                tooltip=[
+                    alt.Tooltip('phase_name:N', title='Phase'),
+                    alt.Tooltip('min(hr_mean):Q', title='Min', format='.1f'),
+                    alt.Tooltip('q1(hr_mean):Q', title='Q1', format='.1f'),
+                    alt.Tooltip('median(hr_mean):Q', title='Median', format='.1f'),
+                    alt.Tooltip('q3(hr_mean):Q', title='Q3', format='.1f'),
+                    alt.Tooltip('max(hr_mean):Q', title='Max', format='.1f')
+                ]
+            ).properties(
+                width=700,
+                height=400
+            ).interactive()
             
-            chart = viz.plot_hr_hormone_timeseries(participant_id=selected_participant)
-            if chart:
-                st.altair_chart(chart, use_container_width=True)
-                st.markdown("""
-                This time series visualization shows how heart rate and hormone levels change over time 
-                for an individual participant. The synchronized patterns can reveal relationships between 
-                physiological measurements and hormonal fluctuations.
-                """)
-            else:
-                st.warning("Unable to generate chart - check data format")
+            st.altair_chart(box_plot, use_container_width=True)
+            st.markdown("Heart rate patterns vary across menstrual cycle phases, with notable changes during the fertility phase.")
         
-        elif plot_type == "Correlation Heatmap":
-            st.subheader("📊 Correlation Matrix: HR & Hormones")
-            chart = viz.plot_correlation_matrix()
-            if chart:
-                st.altair_chart(chart, use_container_width=True)
-                st.markdown("""
-                This heatmap displays correlations between heart rate metrics and hormone levels. 
-                Values closer to 1 (red) indicate strong positive correlation, while values closer to -1 (blue) 
-                indicate strong negative correlation. Values near 0 suggest little to no linear relationship.
-                """)
-            else:
-                st.warning("Unable to generate chart - check data format")
-        
-        elif plot_type == "Heart Rate Variability (HRV)":
-            st.subheader("📊 Heart Rate Variability Analysis")
-            chart = viz.plot_hrv_analysis()
-            if chart:
-                st.altair_chart(chart, use_container_width=True)
-                st.markdown("""
-                Heart Rate Variability (HRV) is a measure of variation in time between heartbeats. 
-                Higher HRV is generally associated with better cardiovascular health and stress resilience. 
-                The visualization shows the distribution of HRV and how it changes over time.
-                """)
-            else:
-                st.warning("Unable to generate chart - check data format")
-        
-        elif plot_type == "Participant Comparison":
-            st.subheader("📊 Participant Comparison")
+        # 2️⃣ HR & Hormones Over Time
+        elif plot_type == "HR & Hormones Over Time":
+            st.subheader("📊 Heart Rate & Hormones Time Series")
             
-            n_participants = st.slider(
-                "Number of participants to compare:",
-                min_value=3,
-                max_value=min(12, len(viz.df['id'].unique())),
-                value=6
+            # Select a participant
+            available_ids = df_merged['id'].unique()
+            selected_id = st.selectbox("Select Participant:", available_ids)
+            
+            df_participant = df_merged[df_merged['id'] == selected_id].sort_values('day_in_study')
+            
+            # HR Chart
+            hr_chart = alt.Chart(df_participant).mark_line(
+                color='#ef4444',
+                strokeWidth=3,
+                point=alt.OverlayMarkDef(filled=True, size=60)
+            ).encode(
+                x=alt.X('day_in_study:Q', title='Day in Study'),
+                y=alt.Y('hr_mean:Q', 
+                       title='Heart Rate (bpm)',
+                       scale=alt.Scale(zero=False)),
+                tooltip=[
+                    alt.Tooltip('day_in_study:Q', title='Day'),
+                    alt.Tooltip('hr_mean:Q', title='Heart Rate', format='.1f')
+                ]
+            ).properties(
+                width=800,
+                height=250,
+                title='Heart Rate Over Time'
             )
             
-            chart = viz.plot_participant_comparison(n_participants=n_participants)
-            if chart:
-                st.altair_chart(chart, use_container_width=True)
-                st.markdown("""
-                This small multiples visualization allows comparison of heart rate patterns across different 
-                participants. Each panel shows one participant's heart rate trajectory over time, highlighting 
-                inter-individual variability in physiological responses.
-                """)
-            else:
-                st.warning("Unable to generate chart - check data format")
+            # Estrogen Chart
+            estrogen_chart = alt.Chart(df_participant).mark_line(
+                color='#3b82f6',
+                strokeWidth=3,
+                point=alt.OverlayMarkDef(filled=True, size=60)
+            ).encode(
+                x=alt.X('day_in_study:Q', title='Day in Study'),
+                y=alt.Y('estrogen:Q', 
+                       title='Estrogen Level',
+                       scale=alt.Scale(zero=False)),
+                tooltip=[
+                    alt.Tooltip('day_in_study:Q', title='Day'),
+                    alt.Tooltip('estrogen:Q', title='Estrogen', format='.2f')
+                ]
+            ).properties(
+                width=800,
+                height=250,
+                title='Estrogen Levels'
+            )
+            
+            # LH Chart
+            lh_chart = alt.Chart(df_participant).mark_line(
+                color='#8b5cf6',
+                strokeWidth=3,
+                point=alt.OverlayMarkDef(filled=True, size=60)
+            ).encode(
+                x=alt.X('day_in_study:Q', title='Day in Study'),
+                y=alt.Y('lh:Q', 
+                       title='LH Level',
+                       scale=alt.Scale(zero=False)),
+                tooltip=[
+                    alt.Tooltip('day_in_study:Q', title='Day'),
+                    alt.Tooltip('lh:Q', title='LH', format='.2f')
+                ]
+            ).properties(
+                width=800,
+                height=250,
+                title='LH (Luteinizing Hormone) Levels'
+            )
+            
+            combined = alt.vconcat(hr_chart, estrogen_chart, lh_chart).resolve_scale(x='shared')
+            st.altair_chart(combined, use_container_width=True)
+            st.markdown("These synchronized time series show how heart rate and hormones fluctuate throughout the menstrual cycle.")
         
-        elif plot_type == "Phase Statistics":
-            st.subheader("📊 Mean Heart Rate by Phase")
-            chart = viz.plot_phase_statistics()
-            if chart:
-                st.altair_chart(chart, use_container_width=True)
-                st.markdown("""
-                This bar chart shows the average heart rate during each menstrual cycle phase with error bars 
-                representing the standard error of the mean (SEM). This helps identify whether heart rate 
-                significantly differs across cycle phases.
-                """)
-            else:
-                st.warning("Unable to generate chart - check data format")
+        # 3️⃣ Hormone Levels by Phase
+        elif plot_type == "Hormone Levels by Phase":
+            st.subheader("📊 Average Hormone Levels by Cycle Phase")
+            
+            # Map phase_encoded to phase names
+            phase_mapping = {0: 'Follicular', 1: 'Fertility', 2: 'Luteal', 3: 'Menstrual'}
+            df_merged['phase_name'] = df_merged['phase_encoded'].map(phase_mapping)
+            
+            # Calculate averages
+            phase_hormones = df_merged.groupby('phase_name')[['estrogen', 'lh', 'pdg']].mean().reset_index()
+            
+            # Melt for grouped bar chart
+            hormones_melted = phase_hormones.melt(
+                id_vars=['phase_name'],
+                value_vars=['estrogen', 'lh', 'pdg'],
+                var_name='hormone',
+                value_name='level'
+            )
+            
+            # Rename hormones
+            hormone_names = {'estrogen': 'Estrogen', 'lh': 'LH', 'pdg': 'PDG'}
+            hormones_melted['hormone_name'] = hormones_melted['hormone'].map(hormone_names)
+            
+            chart = alt.Chart(hormones_melted).mark_bar(
+                opacity=0.8
+            ).encode(
+                x=alt.X('phase_name:N', 
+                       title='Cycle Phase',
+                       sort=['Follicular', 'Fertility', 'Luteal', 'Menstrual']),
+                y=alt.Y('level:Q', title='Hormone Level'),
+                color=alt.Color('hormone_name:N', 
+                              title='Hormone',
+                              scale=alt.Scale(scheme='category10')),
+                xOffset='hormone_name:N',
+                tooltip=[
+                    alt.Tooltip('phase_name:N', title='Phase'),
+                    alt.Tooltip('hormone_name:N', title='Hormone'),
+                    alt.Tooltip('level:Q', title='Level', format='.2f')
+                ]
+            ).properties(
+                width=800,
+                height=400
+            ).interactive()
+            
+            st.altair_chart(chart, use_container_width=True)
+            st.markdown("Estrogen peaks during fertility phase, while LH surges before ovulation. PDG (progesterone) is highest during luteal phase.")
+        
+        # 4️⃣ Symptoms by Phase
+        elif plot_type == "Symptoms by Phase":
+            st.subheader("📊 Common Symptoms Across Cycle Phases")
+            
+            # Map phase_encoded to phase names
+            phase_mapping = {0: 'Follicular', 1: 'Fertility', 2: 'Luteal', 3: 'Menstrual'}
+            df_merged['phase_name'] = df_merged['phase_encoded'].map(phase_mapping)
+            
+            symptom_cols = ['headaches_encoded', 'cramps_encoded', 'fatigue_encoded', 
+                           'moodswing_encoded', 'bloating_encoded']
+            symptom_names = ['Headaches', 'Cramps', 'Fatigue', 'Mood Swings', 'Bloating']
+            
+            # Calculate averages
+            phase_symptoms = df_merged.groupby('phase_name')[symptom_cols].mean().reset_index()
+            
+            # Melt data
+            symptoms_melted = phase_symptoms.melt(
+                id_vars=['phase_name'],
+                value_vars=symptom_cols,
+                var_name='symptom',
+                value_name='score'
+            )
+            
+            symptom_mapping = dict(zip(symptom_cols, symptom_names))
+            symptoms_melted['symptom_name'] = symptoms_melted['symptom'].map(symptom_mapping)
+            
+            # Heatmap
+            heatmap = alt.Chart(symptoms_melted).mark_rect().encode(
+                x=alt.X('phase_name:N', 
+                       title='Cycle Phase',
+                       sort=['Follicular', 'Fertility', 'Luteal', 'Menstrual']),
+                y=alt.Y('symptom_name:N', title='Symptom'),
+                color=alt.Color('score:Q',
+                              scale=alt.Scale(scheme='reds'),
+                              title='Severity'),
+                tooltip=[
+                    alt.Tooltip('phase_name:N', title='Phase'),
+                    alt.Tooltip('symptom_name:N', title='Symptom'),
+                    alt.Tooltip('score:Q', title='Average Score', format='.2f')
+                ]
+            ).properties(
+                width=700,
+                height=400
+            ).interactive()
+            
+            st.altair_chart(heatmap, use_container_width=True)
+            st.markdown("Symptoms like cramps and bloating are typically highest during the menstrual phase, while other symptoms vary throughout the cycle.")
+        
+        # 5️⃣ Heart Rate Variability
+        elif plot_type == "Heart Rate Variability":
+            st.subheader("📊 Heart Rate Variability (HRV) Analysis")
+            
+            # HRV distribution
+            hrv_hist = alt.Chart(df_merged).mark_bar(
+                color='#0d9488',
+                opacity=0.7
+            ).encode(
+                alt.X('hr_std:Q', 
+                     bin=alt.Bin(maxbins=40), 
+                     title='Heart Rate Standard Deviation (bpm)'),
+                alt.Y('count()', title='Frequency'),
+                tooltip=[
+                    alt.Tooltip('hr_std:Q', bin=alt.Bin(maxbins=40), title='HRV Range'),
+                    alt.Tooltip('count()', title='Count')
+                ]
+            ).properties(
+                width=700,
+                height=300,
+                title='Distribution of Heart Rate Variability'
+            )
+            
+            # Mean line
+            mean_hrv = df_merged['hr_std'].mean()
+            mean_line = alt.Chart(pd.DataFrame({'mean': [mean_hrv]})).mark_rule(
+                color='red',
+                strokeWidth=2,
+                strokeDash=[5, 5]
+            ).encode(
+                x='mean:Q'
+            )
+            
+            hrv_chart = (hrv_hist + mean_line).interactive()
+            
+            # HRV by phase
+            phase_mapping = {0: 'Follicular', 1: 'Fertility', 2: 'Luteal', 3: 'Menstrual'}
+            df_merged['phase_name'] = df_merged['phase_encoded'].map(phase_mapping)
+            
+            hrv_violin = alt.Chart(df_merged).mark_boxplot(
+                size=50
+            ).encode(
+                x=alt.X('phase_name:N', 
+                       title='Cycle Phase',
+                       sort=['Follicular', 'Fertility', 'Luteal', 'Menstrual']),
+                y=alt.Y('hr_std:Q', title='HRV (Std Dev)', scale=alt.Scale(zero=False)),
+                color=alt.Color('phase_name:N', scale=alt.Scale(scheme='set2'), legend=None),
+                tooltip=[
+                    alt.Tooltip('phase_name:N', title='Phase'),
+                    alt.Tooltip('median(hr_std):Q', title='Median HRV', format='.2f')
+                ]
+            ).properties(
+                width=700,
+                height=300,
+                title='HRV Distribution by Cycle Phase'
+            ).interactive()
+            
+            combined_hrv = alt.vconcat(hrv_chart, hrv_violin)
+            st.altair_chart(combined_hrv, use_container_width=True)
+            st.markdown("Higher heart rate variability generally indicates better cardiovascular health and stress resilience. HRV patterns can vary across cycle phases.")
+        
+        # 6️⃣ HR vs Hormones Correlation
+        elif plot_type == "HR vs Hormones Correlation":
+            st.subheader("📊 Heart Rate vs Hormone Levels")
+            
+            # Map phase for color
+            phase_mapping = {0: 'Follicular', 1: 'Fertility', 2: 'Luteal', 3: 'Menstrual'}
+            df_merged['phase_name'] = df_merged['phase_encoded'].map(phase_mapping)
+            
+            # HR vs Estrogen scatter
+            scatter_estrogen = alt.Chart(df_merged).mark_circle(
+                size=60,
+                opacity=0.6
+            ).encode(
+                x=alt.X('estrogen:Q', title='Estrogen Level', scale=alt.Scale(zero=False)),
+                y=alt.Y('hr_mean:Q', title='Heart Rate (bpm)', scale=alt.Scale(zero=False)),
+                color=alt.Color('phase_name:N', 
+                              title='Cycle Phase',
+                              scale=alt.Scale(scheme='category10')),
+                tooltip=[
+                    alt.Tooltip('estrogen:Q', title='Estrogen', format='.2f'),
+                    alt.Tooltip('hr_mean:Q', title='Heart Rate', format='.1f'),
+                    alt.Tooltip('phase_name:N', title='Phase')
+                ]
+            ).properties(
+                width=350,
+                height=350,
+                title='Heart Rate vs Estrogen'
+            ).interactive()
+            
+            # HR vs LH scatter
+            scatter_lh = alt.Chart(df_merged).mark_circle(
+                size=60,
+                opacity=0.6
+            ).encode(
+                x=alt.X('lh:Q', title='LH Level', scale=alt.Scale(zero=False)),
+                y=alt.Y('hr_mean:Q', title='Heart Rate (bpm)', scale=alt.Scale(zero=False)),
+                color=alt.Color('phase_name:N', 
+                              title='Cycle Phase',
+                              scale=alt.Scale(scheme='category10')),
+                tooltip=[
+                    alt.Tooltip('lh:Q', title='LH', format='.2f'),
+                    alt.Tooltip('hr_mean:Q', title='Heart Rate', format='.1f'),
+                    alt.Tooltip('phase_name:N', title='Phase')
+                ]
+            ).properties(
+                width=350,
+                height=350,
+                title='Heart Rate vs LH'
+            ).interactive()
+            
+            combined_scatter = alt.hconcat(scatter_estrogen, scatter_lh)
+            st.altair_chart(combined_scatter, use_container_width=True)
+            st.markdown("These scatter plots reveal potential correlations between heart rate and hormone levels, colored by cycle phase to show patterns.")
 
 
 def decode_phase(phase_code):
