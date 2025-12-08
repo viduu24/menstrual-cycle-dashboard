@@ -59,11 +59,35 @@ def show(period_1, period_2, period_3):
     # ----------------------------------------------------------
     # STATISTICAL SUMMARY
     # ----------------------------------------------------------
-    st.subheader(" Statistical Summary")
+    st.subheader("Statistical Summary")
     st.write(df.describe())
 
     st.markdown("---")
-    
+
+    # ----------------------------------------------------------
+    # 📌 CORRELATION MATRIX (NEW)
+    # ----------------------------------------------------------
+    numeric_cols = df.select_dtypes(include=['float64', 'int64']).columns
+
+    st.subheader("🔗 Correlation Matrix (Numerical Variables Only)")
+
+    if len(numeric_cols) >= 2:
+        corr = df[numeric_cols].corr()
+
+        fig = px.imshow(
+            corr,
+            text_auto=False,
+            color_continuous_scale="RdBu_r",
+            aspect="auto",
+            title="Correlation Heatmap"
+        )
+        fig.update_layout(title_x=0.5, height=600)
+
+        st.plotly_chart(fig, use_container_width=True)
+    else:
+        st.info("Not enough numeric columns to compute correlation matrix.")
+
+    st.markdown("---")
 
     # ----------------------------------------------------------
     # 1️⃣ PERIOD 1 — PIE CHART OF LENGTH OF MENSES
@@ -82,14 +106,13 @@ def show(period_1, period_2, period_3):
             fig.update_layout(title_x=0.5)
             st.plotly_chart(fig, use_container_width=True)
         else:
-            st.info("LengthofMenses column not found in this dataset.")
+            st.info("LengthofMenses column not found.")
 
     # ----------------------------------------------------------
     # 2️⃣ PERIOD 2 — DECODED PHASE BAR CHART
     # ----------------------------------------------------------
     elif dataset.startswith("Period 2"):
 
-        # Identify correct column
         phase_col = None
         for col in ["phase", "phase_encoded", "Phase"]:
             if col in df.columns:
@@ -99,7 +122,6 @@ def show(period_1, period_2, period_3):
         if phase_col:
             st.markdown("### Distribution of Cycle Phases")
 
-            # Decode mapping (adjust if needed)
             phase_map = {
                 1: "Menstrual",
                 2: "Follicular",
@@ -107,7 +129,6 @@ def show(period_1, period_2, period_3):
                 4: "Luteal"
             }
 
-            # Prepare counts
             phase_counts = df[phase_col].value_counts().reset_index()
             phase_counts.columns = ["phase", "count"]
             phase_counts["phase_name"] = phase_counts["phase"].map(phase_map)
@@ -121,16 +142,11 @@ def show(period_1, period_2, period_3):
                 color_discrete_sequence=px.colors.qualitative.Set3
             )
 
-            fig.update_layout(
-                title_x=0.5,
-                xaxis_title="Phase",
-                yaxis_title="Count"
-            )
-
+            fig.update_layout(title_x=0.5)
             st.plotly_chart(fig, use_container_width=True)
 
         else:
-            st.info("Phase column not found in this dataset.")
+            st.info("Phase column not found.")
 
     # ----------------------------------------------------------
     # 3️⃣ MERGED DATASET — HEART RATE HISTOGRAM
@@ -139,7 +155,7 @@ def show(period_1, period_2, period_3):
         hr_cols = [c for c in df.columns if "hr" in c.lower()]
 
         if len(hr_cols) > 0:
-            hr_col = hr_cols[0]  # Use first HR-related column
+            hr_col = hr_cols[0]
             st.markdown(f"### Heart Rate Distribution — **{hr_col}**")
 
             fig = px.histogram(
@@ -153,4 +169,4 @@ def show(period_1, period_2, period_3):
             st.plotly_chart(fig, use_container_width=True)
 
         else:
-            st.info("No heart-rate-related columns found in merged dataset.")
+            st.info("No heart-rate columns found.")
