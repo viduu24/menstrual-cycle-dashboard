@@ -26,7 +26,7 @@ def show():
     # MODEL 1: PHASE PREDICTION
     # ====================================================================
     with tab1:
-        st.header("🌙 Model 2: Cycle Phase Prediction")
+        st.header("Model 2: Cycle Phase Prediction")
         
         col1, col2 = st.columns([2, 1])
         
