@@ -30,8 +30,8 @@ This model predicts the phase of the cycle using daily biological indicators.
 - Captures subtle hormone–cycle interactions  
 
 ## 🎯 **Model Performance**
-- **Training Accuracy:** 0.952  
-- **Macro F1-Score:** 0.952
+- **Training Accuracy:** 0.791  
+- **Macro F1-Score:** 0.787
 
 ---
 
