@@ -40,7 +40,7 @@ def show_predictions():
     # -------------------------------
     # TABS
     # -------------------------------
-    tab1, tab2 = st.tabs([" Phase Prediction (Model 2)", " Cycle Length Prediction (Model 3)"])
+    tab1, tab2 = st.tabs([" Phase Prediction (Model 1)", " Cycle Length Prediction (Model 2)"])
 
 
     # =======================================================
@@ -90,7 +90,7 @@ def show_predictions():
     # MODEL 3 — CYCLE LENGTH PREDICTION
     # =======================================================
     with tab2:
-        st.header("📌 Cycle Length Prediction")
+        st.header(" Cycle Length Prediction")
 
         user_cycle = {}
         for feat in m3_features:
