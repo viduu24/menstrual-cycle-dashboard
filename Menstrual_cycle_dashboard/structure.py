@@ -15,7 +15,7 @@ import joblib
 class MenstrualCycleVisualizer:
     """
     Comprehensive visualization suite for heart rate and hormone data
-    aligned with menstrual cycle phases.
+    aligned with menstrual cycle phases - ALL ALTAIR VERSION.
     """
     
     def __init__(self, data_path):
@@ -26,46 +26,31 @@ class MenstrualCycleVisualizer:
             data_path: Path to final_merged_hr_hormones.csv
         """
         self.df = pd.read_csv(data_path)
-        self.setup_style()
+        # Configure Altair
+        alt.data_transformers.disable_max_rows()
         print(f"✓ Loaded dataset: {self.df.shape}")
         print(f"Columns: {list(self.df.columns)}")
-        
-    def setup_style(self):
-        """Set publication-quality plot style."""
-        plt.style.use('seaborn-v0_8-darkgrid')
-        sns.set_palette("husl")
-        plt.rcParams['figure.dpi'] = 100
-        plt.rcParams['savefig.dpi'] = 300
-        plt.rcParams['font.size'] = 11
-        plt.rcParams['axes.labelsize'] = 12
-        plt.rcParams['axes.titlesize'] = 14
-        plt.rcParams['xtick.labelsize'] = 10
-        plt.rcParams['ytick.labelsize'] = 10
-        plt.rcParams['legend.fontsize'] = 10
         
     # =====================================================
     # VISUALIZATION 1: Heart Rate Across Menstrual Phases
     # =====================================================
     
-    def plot_hr_by_cycle_phase(self, save_path='hr_by_phase.png'):
+    def plot_hr_by_cycle_phase(self):
         """
-        Box plots + violin plots showing HR distribution across cycle phases.
-        Demonstrates time series patterns (RUBRIC: Specialized Data 5%)
+        Box plots showing HR distribution across cycle phases using Altair.
+        Returns Altair chart object for Streamlit.
         """
         print("\n📊 Creating HR by Cycle Phase visualization...")
-        
-        fig, axes = plt.subplots(2, 2, figsize=(16, 12))
         
         # Detect HR column name
         hr_col = 'hr_mean' if 'hr_mean' in self.df.columns else 'heart_rate'
         
-        # Define cycle phases (customize based on your data)
+        # Define cycle phases
         if 'cycle_phase' in self.df.columns:
             phase_col = 'cycle_phase'
         elif 'phase' in self.df.columns:
             phase_col = 'phase'
         else:
-            # Create phases based on day_in_study if available
             if 'day_in_study' in self.df.columns:
                 self.df['cycle_phase'] = pd.cut(
                     self.df['day_in_study'] % 28,
@@ -75,85 +60,45 @@ class MenstrualCycleVisualizer:
                 phase_col = 'cycle_phase'
             else:
                 print("⚠ No cycle phase information found")
-                return
+                return None
         
-        # 1. Box Plot
-        sns.boxplot(data=self.df, x=phase_col, y=hr_col, ax=axes[0, 0],
-                   palette='Set2', linewidth=2)
-        axes[0, 0].set_title('Heart Rate Distribution by Cycle Phase', 
-                            fontweight='bold', fontsize=14)
-        axes[0, 0].set_ylabel('Heart Rate (bpm)', fontsize=12)
-        axes[0, 0].set_xlabel('Cycle Phase', fontsize=12)
-        axes[0, 0].grid(axis='y', alpha=0.3)
+        # Prepare data
+        plot_data = self.df[[phase_col, hr_col]].dropna()
         
-        # 2. Violin Plot with quartiles
-        sns.violinplot(data=self.df, x=phase_col, y=hr_col, ax=axes[0, 1],
-                      palette='muted', inner='quartile')
-        axes[0, 1].set_title('Heart Rate Density by Cycle Phase',
-                            fontweight='bold', fontsize=14)
-        axes[0, 1].set_ylabel('Heart Rate (bpm)', fontsize=12)
-        axes[0, 1].set_xlabel('Cycle Phase', fontsize=12)
+        # Create box plot
+        box_plot = alt.Chart(plot_data).mark_boxplot(
+            size=60,
+            opacity=0.7
+        ).encode(
+            x=alt.X(f'{phase_col}:N', title='Cycle Phase'),
+            y=alt.Y(f'{hr_col}:Q', title='Heart Rate (bpm)', scale=alt.Scale(zero=False)),
+            color=alt.Color(f'{phase_col}:N', 
+                          scale=alt.Scale(scheme='set2'),
+                          legend=None),
+            tooltip=[
+                alt.Tooltip(f'{phase_col}:N', title='Phase'),
+                alt.Tooltip(f'min({hr_col}):Q', title='Min', format='.1f'),
+                alt.Tooltip(f'q1({hr_col}):Q', title='Q1', format='.1f'),
+                alt.Tooltip(f'median({hr_col}):Q', title='Median', format='.1f'),
+                alt.Tooltip(f'q3({hr_col}):Q', title='Q3', format='.1f'),
+                alt.Tooltip(f'max({hr_col}):Q', title='Max', format='.1f')
+            ]
+        ).properties(
+            width=700,
+            height=400,
+            title='Heart Rate Distribution by Cycle Phase'
+        ).interactive()
         
-        # 3. Mean ± SEM by phase
-        phase_stats = self.df.groupby(phase_col)[hr_col].agg(['mean', 'sem'])
-        x_pos = range(len(phase_stats))
-        axes[1, 0].bar(x_pos, phase_stats['mean'], yerr=phase_stats['sem'],
-                      capsize=8, alpha=0.7, color='steelblue', edgecolor='black')
-        axes[1, 0].set_xticks(x_pos)
-        axes[1, 0].set_xticklabels(phase_stats.index, rotation=0)
-        axes[1, 0].set_title('Mean Heart Rate ± SEM by Phase',
-                            fontweight='bold', fontsize=14)
-        axes[1, 0].set_ylabel('Heart Rate (bpm)', fontsize=12)
-        axes[1, 0].set_xlabel('Cycle Phase', fontsize=12)
-        axes[1, 0].grid(axis='y', alpha=0.3)
-        
-        # 4. Statistical significance (ANOVA)
-        phases = self.df[phase_col].unique()
-        phase_groups = [self.df[self.df[phase_col] == p][hr_col].dropna() 
-                       for p in phases]
-        
-        if len(phase_groups) >= 2:
-            f_stat, p_value = stats.f_oneway(*phase_groups)
-            
-            axes[1, 1].axis('off')
-            stats_text = f"""
-            STATISTICAL ANALYSIS
-            {'='*40}
-            
-            Test: One-Way ANOVA
-            Groups: {', '.join(map(str, phases))}
-            
-            F-statistic: {f_stat:.3f}
-            P-value: {p_value:.4f}
-            
-            Interpretation:
-            {'Significant difference' if p_value < 0.05 else 'No significant difference'}
-            between phases (α = 0.05)
-            
-            Sample Sizes:
-            """
-            for phase in phases:
-                n = len(self.df[self.df[phase_col] == phase])
-                stats_text += f"\n  {phase}: n={n}"
-            
-            axes[1, 1].text(0.1, 0.5, stats_text, transform=axes[1, 1].transAxes,
-                          fontsize=11, verticalalignment='center',
-                          bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.5),
-                          family='monospace')
-        
-        plt.tight_layout()
-        plt.savefig(save_path, dpi=300, bbox_inches='tight')
-        print(f"✓ Saved to {save_path}")
-        plt.show()
+        return box_plot
     
     # =====================================================
     # VISUALIZATION 2: Time Series of HR + Hormones
     # =====================================================
     
-    def plot_hr_hormone_timeseries(self, participant_id=None, save_path='hr_hormone_timeseries.png'):
+    def plot_hr_hormone_timeseries(self, participant_id=None):
         """
-        Dual-axis time series showing HR and hormone levels together.
-        Publication-quality with confidence intervals.
+        Time series showing HR and hormone levels together.
+        Returns Altair chart object for Streamlit.
         """
         print("\n📊 Creating HR + Hormone Time Series...")
         
@@ -161,77 +106,81 @@ class MenstrualCycleVisualizer:
             participant_id = self.df['id'].iloc[0]
         
         # Filter for one participant
-        df_p = self.df[self.df['id'] == participant_id].sort_values('day_in_study')
+        df_p = self.df[self.df['id'] == participant_id].sort_values('day_in_study').copy()
         
         hr_col = 'hr_mean' if 'hr_mean' in self.df.columns else 'heart_rate'
         
         # Detect hormone columns
         hormone_cols = [col for col in df_p.columns 
-                       if any(x in col.lower() for x in ['estrogen', 'progesterone', 'lh', 'fsh'])]
+                       if any(x in col.lower() for x in ['estrogen', 'progesterone', 'lh', 'pdg'])]
         
         if not hormone_cols:
             print("⚠ No hormone columns found")
-            return
+            return None
         
-        fig, axes = plt.subplots(len(hormone_cols) + 1, 1, 
-                                figsize=(14, 4 * (len(hormone_cols) + 1)),
-                                sharex=True)
+        # Create HR line chart
+        hr_chart = alt.Chart(df_p).mark_line(
+            color='#ef4444',
+            strokeWidth=3,
+            point=alt.OverlayMarkDef(filled=True, size=50)
+        ).encode(
+            x=alt.X('day_in_study:Q', title='Day in Study'),
+            y=alt.Y(f'{hr_col}:Q', title='Heart Rate (bpm)', scale=alt.Scale(zero=False)),
+            tooltip=[
+                alt.Tooltip('day_in_study:Q', title='Day'),
+                alt.Tooltip(f'{hr_col}:Q', title='Heart Rate', format='.1f')
+            ]
+        ).properties(
+            width=800,
+            height=300,
+            title=f'Heart Rate - Participant {participant_id}'
+        )
         
-        if len(hormone_cols) == 0:
-            axes = [axes]
+        # Create hormone charts
+        hormone_charts = []
+        colors = ['#3b82f6', '#10b981', '#8b5cf6', '#f59e0b']
         
-        # Plot HR
-        ax1 = axes[0]
-        ax1.plot(df_p['day_in_study'], df_p[hr_col], 
-                linewidth=2.5, color='crimson', label='Heart Rate', marker='o', markersize=4)
-        
-        # Add confidence band if hr_std exists
-        if 'hr_std' in df_p.columns:
-            ax1.fill_between(df_p['day_in_study'],
-                            df_p[hr_col] - df_p['hr_std'],
-                            df_p[hr_col] + df_p['hr_std'],
-                            alpha=0.2, color='crimson', label='±1 SD')
-        
-        ax1.set_ylabel('Heart Rate (bpm)', fontsize=13, fontweight='bold', color='crimson')
-        ax1.tick_params(axis='y', labelcolor='crimson')
-        ax1.grid(alpha=0.3)
-        ax1.legend(loc='upper left')
-        ax1.set_title(f'Participant {participant_id}: Heart Rate & Hormone Dynamics',
-                     fontsize=15, fontweight='bold', pad=15)
-        
-        # Plot each hormone
-        colors = ['blue', 'green', 'purple', 'orange']
-        for i, (hormone_col, color) in enumerate(zip(hormone_cols, colors), 1):
-            ax = axes[i]
-            
-            # Remove missing values for cleaner plot
+        for i, (hormone_col, color) in enumerate(zip(hormone_cols[:4], colors)):
             valid_data = df_p[['day_in_study', hormone_col]].dropna()
             
-            ax.plot(valid_data['day_in_study'], valid_data[hormone_col],
-                   linewidth=2.5, color=color, marker='s', markersize=5,
-                   label=hormone_col.replace('_', ' ').title())
-            
-            ax.set_ylabel(hormone_col.replace('_', ' ').title(),
-                         fontsize=13, fontweight='bold', color=color)
-            ax.tick_params(axis='y', labelcolor=color)
-            ax.grid(alpha=0.3)
-            ax.legend(loc='upper left')
+            if len(valid_data) > 0:
+                chart = alt.Chart(valid_data).mark_line(
+                    color=color,
+                    strokeWidth=3,
+                    point=alt.OverlayMarkDef(filled=True, size=50)
+                ).encode(
+                    x=alt.X('day_in_study:Q', title='Day in Study'),
+                    y=alt.Y(f'{hormone_col}:Q', 
+                           title=hormone_col.replace('_', ' ').title(),
+                           scale=alt.Scale(zero=False)),
+                    tooltip=[
+                        alt.Tooltip('day_in_study:Q', title='Day'),
+                        alt.Tooltip(f'{hormone_col}:Q', title=hormone_col.replace('_', ' ').title(), format='.2f')
+                    ]
+                ).properties(
+                    width=800,
+                    height=250,
+                    title=hormone_col.replace('_', ' ').title()
+                )
+                hormone_charts.append(chart)
         
-        axes[-1].set_xlabel('Day in Study', fontsize=13, fontweight='bold')
-        
-        plt.tight_layout()
-        plt.savefig(save_path, dpi=300, bbox_inches='tight')
-        print(f"✓ Saved to {save_path}")
-        plt.show()
+        # Combine charts vertically
+        if hormone_charts:
+            combined = alt.vconcat(hr_chart, *hormone_charts).resolve_scale(
+                x='shared'
+            )
+            return combined
+        else:
+            return hr_chart
     
     # =====================================================
     # VISUALIZATION 3: Correlation Heatmap
     # =====================================================
     
-    def plot_correlation_matrix(self, save_path='correlation_heatmap.png'):
+    def plot_correlation_matrix(self):
         """
-        Advanced correlation heatmap with hierarchical clustering.
-        Shows relationships between HR metrics and hormones.
+        Correlation heatmap with Altair.
+        Returns Altair chart object for Streamlit.
         """
         print("\n📊 Creating Correlation Matrix...")
         
@@ -242,92 +191,196 @@ class MenstrualCycleVisualizer:
         hr_cols = [col for col in numeric_cols 
                   if any(x in col.lower() for x in ['hr_', 'heart_rate', 'bpm'])]
         hormone_cols = [col for col in numeric_cols 
-                       if any(x in col.lower() for x in ['estrogen', 'progesterone', 'lh', 'fsh', 'testosterone'])]
+                       if any(x in col.lower() for x in ['estrogen', 'progesterone', 'lh', 'pdg', 'testosterone'])]
         
-        selected_cols = hr_cols + hormone_cols
+        selected_cols = list(set(hr_cols + hormone_cols))[:10]  # Limit to 10 for readability
         
         if len(selected_cols) < 2:
             print("⚠ Not enough numeric columns for correlation")
-            return
+            return None
         
         # Compute correlation matrix
         corr_matrix = self.df[selected_cols].corr()
         
-        # Create figure
-        fig, axes = plt.subplots(1, 2, figsize=(18, 8))
+        # Transform to long format
+        corr_data = corr_matrix.stack().reset_index()
+        corr_data.columns = ['Variable 1', 'Variable 2', 'Correlation']
         
-        # 1. Regular heatmap
-        sns.heatmap(corr_matrix, annot=True, fmt='.2f', cmap='coolwarm',
-                   center=0, vmin=-1, vmax=1, square=True, ax=axes[0],
-                   cbar_kws={'label': 'Correlation Coefficient'})
-        axes[0].set_title('Correlation Matrix: HR & Hormones',
-                         fontsize=15, fontweight='bold', pad=15)
+        # Create heatmap
+        heatmap = alt.Chart(corr_data).mark_rect().encode(
+            x=alt.X('Variable 1:N', title=None),
+            y=alt.Y('Variable 2:N', title=None),
+            color=alt.Color('Correlation:Q',
+                          scale=alt.Scale(scheme='redblue', domain=[-1, 1]),
+                          title='Correlation'),
+            tooltip=[
+                alt.Tooltip('Variable 1:N'),
+                alt.Tooltip('Variable 2:N'),
+                alt.Tooltip('Correlation:Q', format='.3f')
+            ]
+        ).properties(
+            width=600,
+            height=600,
+            title='Correlation Matrix: HR & Hormones'
+        )
         
-        # 2. Clustered heatmap
-        sns.clustermap(corr_matrix, annot=True, fmt='.2f', cmap='coolwarm',
-                      center=0, vmin=-1, vmax=1, figsize=(10, 10),
-                      cbar_kws={'label': 'Correlation Coefficient'})
-        plt.savefig(save_path.replace('.png', '_clustered.png'), dpi=300, bbox_inches='tight')
+        # Add text annotations
+        text = alt.Chart(corr_data).mark_text(baseline='middle').encode(
+            x=alt.X('Variable 1:N', title=None),
+            y=alt.Y('Variable 2:N', title=None),
+            text=alt.Text('Correlation:Q', format='.2f'),
+            color=alt.condition(
+                alt.datum.Correlation > 0.5,
+                alt.value('white'),
+                alt.value('black')
+            )
+        )
         
-        axes[1].axis('off')
-        axes[1].text(0.5, 0.5, 'See separate clustered heatmap figure →',
-                    transform=axes[1].transAxes, ha='center', va='center',
-                    fontsize=14, style='italic')
-        
-        plt.tight_layout()
-        plt.savefig(save_path, dpi=300, bbox_inches='tight')
-        print(f"✓ Saved to {save_path}")
-        print(f"✓ Saved clustered version to {save_path.replace('.png', '_clustered.png')}")
-        plt.show()
+        return (heatmap + text).interactive()
     
     # =====================================================
     # VISUALIZATION 4: Heart Rate Variability Analysis
     # =====================================================
     
-    def plot_hrv_analysis(self, save_path='hrv_analysis.png'):
+    def plot_hrv_analysis(self):
         """
-        Heart Rate Variability (standard deviation) across cycle.
-        Shows autonomic nervous system activity.
+        Heart Rate Variability analysis with Altair.
+        Returns Altair chart object for Streamlit.
         """
         print("\n📊 Creating HRV Analysis...")
         
         if 'hr_std' not in self.df.columns:
             print("⚠ No hr_std column for variability analysis")
-            return
+            return None
         
-        fig, axes = plt.subplots(2, 2, figsize=(16, 12))
+        # Prepare data
+        hrv_data = self.df[['hr_std']].dropna()
         
-        # 1. HRV distribution
-        axes[0, 0].hist(self.df['hr_std'].dropna(), bins=50, 
-                       color='teal', alpha=0.7, edgecolor='black')
-        axes[0, 0].axvline(self.df['hr_std'].mean(), color='red', 
-                          linestyle='--', linewidth=2, label='Mean')
-        axes[0, 0].axvline(self.df['hr_std'].median(), color='orange',
-                          linestyle='--', linewidth=2, label='Median')
-        axes[0, 0].set_xlabel('Heart Rate Std Dev (bpm)', fontsize=12)
-        axes[0, 0].set_ylabel('Frequency', fontsize=12)
-        axes[0, 0].set_title('Distribution of Heart Rate Variability',
-                            fontweight='bold', fontsize=14)
-        axes[0, 0].legend()
-        axes[0, 0].grid(alpha=0.3)
+        # 1. HRV distribution histogram
+        hist = alt.Chart(hrv_data).mark_bar(
+            color='#0d9488',
+            opacity=0.7
+        ).encode(
+            alt.X('hr_std:Q', bin=alt.Bin(maxbins=40), title='Heart Rate Std Dev (bpm)'),
+            alt.Y('count()', title='Frequency'),
+            tooltip=[
+                alt.Tooltip('hr_std:Q', bin=alt.Bin(maxbins=40), title='HRV Range'),
+                alt.Tooltip('count()', title='Count')
+            ]
+        ).properties(
+            width=700,
+            height=300,
+            title='Distribution of Heart Rate Variability'
+        )
         
-        # 2. HRV over time (rolling average)
+        # Add mean and median lines
+        mean_val = hrv_data['hr_std'].mean()
+        median_val = hrv_data['hr_std'].median()
+        
+        mean_line = alt.Chart(pd.DataFrame({'value': [mean_val], 'label': ['Mean']})).mark_rule(
+            color='red',
+            strokeWidth=2,
+            strokeDash=[5, 5]
+        ).encode(
+            x='value:Q'
+        )
+        
+        median_line = alt.Chart(pd.DataFrame({'value': [median_val], 'label': ['Median']})).mark_rule(
+            color='orange',
+            strokeWidth=2,
+            strokeDash=[5, 5]
+        ).encode(
+            x='value:Q'
+        )
+        
+        hrv_chart = (hist + mean_line + median_line).interactive()
+        
+        # 2. HRV over time if available
         if 'day_in_study' in self.df.columns:
-            daily_hrv = self.df.groupby('day_in_study')['hr_std'].mean()
-            rolling_hrv = daily_hrv.rolling(window=7, center=True).mean()
+            daily_hrv = self.df.groupby('day_in_study')['hr_std'].mean().reset_index()
             
-            axes[0, 1].plot(daily_hrv.index, daily_hrv.values, 
-                           alpha=0.3, color='gray', label='Daily HRV')
-            axes[0, 1].plot(rolling_hrv.index, rolling_hrv.values,
-                           linewidth=3, color='darkblue', label='7-day Rolling Avg')
-            axes[0, 1].set_xlabel('Day in Study', fontsize=12)
-            axes[0, 1].set_ylabel('HRV (Std Dev)', fontsize=12)
-            axes[0, 1].set_title('Heart Rate Variability Over Time',
-                                fontweight='bold', fontsize=14)
-            axes[0, 1].legend()
-            axes[0, 1].grid(alpha=0.3)
+            time_chart = alt.Chart(daily_hrv).mark_line(
+                color='#1e40af',
+                strokeWidth=2,
+                point=True
+            ).encode(
+                x=alt.X('day_in_study:Q', title='Day in Study'),
+                y=alt.Y('hr_std:Q', title='Average HRV', scale=alt.Scale(zero=False)),
+                tooltip=[
+                    alt.Tooltip('day_in_study:Q', title='Day'),
+                    alt.Tooltip('hr_std:Q', title='Avg HRV', format='.2f')
+                ]
+            ).properties(
+                width=700,
+                height=300,
+                title='Heart Rate Variability Over Time'
+            ).interactive()
+            
+            return alt.vconcat(hrv_chart, time_chart)
         
-        # 3. HRV by cycle phase
+        return hrv_chart
+    
+    # =====================================================
+    # VISUALIZATION 5: Multi-Participant Comparison
+    # =====================================================
+    
+    def plot_participant_comparison(self, n_participants=6):
+        """
+        Small multiples showing HR patterns across multiple participants.
+        Returns Altair chart object for Streamlit.
+        """
+        print("\n📊 Creating Participant Comparison...")
+        
+        participants = self.df['id'].unique()[:n_participants]
+        hr_col = 'hr_mean' if 'hr_mean' in self.df.columns else 'heart_rate'
+        
+        # Filter data for selected participants
+        comparison_data = self.df[self.df['id'].isin(participants)].copy()
+        comparison_data = comparison_data.sort_values(['id', 'day_in_study'])
+        
+        # Create small multiples
+        chart = alt.Chart(comparison_data).mark_line(
+            point=True,
+            strokeWidth=2
+        ).encode(
+            x=alt.X('day_in_study:Q', title='Day in Study'),
+            y=alt.Y(f'{hr_col}:Q', 
+                   title='Heart Rate (bpm)',
+                   scale=alt.Scale(zero=False)),
+            color=alt.Color('id:N', legend=None),
+            tooltip=[
+                alt.Tooltip('id:N', title='Participant'),
+                alt.Tooltip('day_in_study:Q', title='Day'),
+                alt.Tooltip(f'{hr_col}:Q', title='Heart Rate', format='.1f')
+            ]
+        ).properties(
+            width=250,
+            height=200
+        ).facet(
+            facet=alt.Facet('id:N', title='Participant ID'),
+            columns=3
+        ).resolve_scale(
+            y='independent'
+        ).properties(
+            title='Heart Rate Patterns Across Participants'
+        ).interactive()
+        
+        return chart
+    
+    # =====================================================
+    # VISUALIZATION 6: Phase Statistics
+    # =====================================================
+    
+    def plot_phase_statistics(self):
+        """
+        Bar chart showing mean HR and statistics by phase.
+        Returns Altair chart object for Streamlit.
+        """
+        print("\n📊 Creating Phase Statistics...")
+        
+        hr_col = 'hr_mean' if 'hr_mean' in self.df.columns else 'heart_rate'
+        
+        # Define cycle phases
         if 'cycle_phase' in self.df.columns:
             phase_col = 'cycle_phase'
         elif 'phase' in self.df.columns:
@@ -340,222 +393,43 @@ class MenstrualCycleVisualizer:
                     labels=['Menstrual', 'Follicular', 'Luteal']
                 )
                 phase_col = 'cycle_phase'
+            else:
+                print("⚠ No cycle phase information found")
+                return None
         
-        if phase_col in self.df.columns:
-            sns.violinplot(data=self.df, x=phase_col, y='hr_std',
-                          ax=axes[1, 0], palette='Set3', inner='box')
-            axes[1, 0].set_xlabel('Cycle Phase', fontsize=12)
-            axes[1, 0].set_ylabel('HRV (Std Dev)', fontsize=12)
-            axes[1, 0].set_title('HRV Distribution by Cycle Phase',
-                                fontweight='bold', fontsize=14)
-            axes[1, 0].grid(axis='y', alpha=0.3)
+        # Calculate statistics
+        phase_stats = self.df.groupby(phase_col)[hr_col].agg(['mean', 'std', 'count']).reset_index()
+        phase_stats['sem'] = phase_stats['std'] / np.sqrt(phase_stats['count'])
         
-        # 4. HR mean vs HRV scatter
-        hr_col = 'hr_mean' if 'hr_mean' in self.df.columns else 'heart_rate'
-        axes[1, 1].scatter(self.df[hr_col], self.df['hr_std'],
-                          alpha=0.5, s=30, color='purple')
+        # Create bar chart with error bars
+        bars = alt.Chart(phase_stats).mark_bar(
+            opacity=0.7,
+            color='steelblue'
+        ).encode(
+            x=alt.X(f'{phase_col}:N', title='Cycle Phase'),
+            y=alt.Y('mean:Q', title='Mean Heart Rate (bpm)'),
+            tooltip=[
+                alt.Tooltip(f'{phase_col}:N', title='Phase'),
+                alt.Tooltip('mean:Q', title='Mean HR', format='.2f'),
+                alt.Tooltip('std:Q', title='Std Dev', format='.2f'),
+                alt.Tooltip('count:Q', title='Sample Size')
+            ]
+        )
         
-        # Add regression line
-        valid_data = self.df[[hr_col, 'hr_std']].dropna()
-        z = np.polyfit(valid_data[hr_col], valid_data['hr_std'], 1)
-        p = np.poly1d(z)
-        x_line = np.linspace(valid_data[hr_col].min(), valid_data[hr_col].max(), 100)
-        axes[1, 1].plot(x_line, p(x_line), "r--", linewidth=2, 
-                       label=f'y={z[0]:.3f}x+{z[1]:.2f}')
+        # Error bars
+        error_bars = alt.Chart(phase_stats).mark_errorbar(extent='stderr').encode(
+            x=alt.X(f'{phase_col}:N'),
+            y=alt.Y('mean:Q'),
+            yError='sem:Q'
+        )
         
-        axes[1, 1].set_xlabel('Mean Heart Rate (bpm)', fontsize=12)
-        axes[1, 1].set_ylabel('HRV (Std Dev)', fontsize=12)
-        axes[1, 1].set_title('Heart Rate vs Variability',
-                            fontweight='bold', fontsize=14)
-        axes[1, 1].legend()
-        axes[1, 1].grid(alpha=0.3)
+        chart = (bars + error_bars).properties(
+            width=600,
+            height=400,
+            title='Mean Heart Rate ± SEM by Cycle Phase'
+        ).interactive()
         
-        plt.tight_layout()
-        plt.savefig(save_path, dpi=300, bbox_inches='tight')
-        print(f"✓ Saved to {save_path}")
-        plt.show()
-    
-    # =====================================================
-    # VISUALIZATION 5: Multi-Participant Comparison
-    # =====================================================
-    
-    def plot_participant_comparison(self, n_participants=6, save_path='participant_comparison.png'):
-        """
-        Small multiples showing HR patterns across multiple participants.
-        Demonstrates inter-individual variability.
-        """
-        print("\n📊 Creating Participant Comparison...")
-        
-        participants = self.df['id'].unique()[:n_participants]
-        hr_col = 'hr_mean' if 'hr_mean' in self.df.columns else 'heart_rate'
-        
-        n_cols = 3
-        n_rows = int(np.ceil(len(participants) / n_cols))
-        
-        fig, axes = plt.subplots(n_rows, n_cols, figsize=(18, 5*n_rows), sharex=True)
-        axes = axes.flatten() if n_participants > 1 else [axes]
-        
-        for i, pid in enumerate(participants):
-            df_p = self.df[self.df['id'] == pid].sort_values('day_in_study')
-            
-            axes[i].plot(df_p['day_in_study'], df_p[hr_col],
-                        linewidth=2, marker='o', markersize=3, alpha=0.8)
-            
-            # Add shaded region for variability if available
-            if 'hr_std' in df_p.columns:
-                axes[i].fill_between(df_p['day_in_study'],
-                                    df_p[hr_col] - df_p['hr_std'],
-                                    df_p[hr_col] + df_p['hr_std'],
-                                    alpha=0.2)
-            
-            axes[i].set_title(f'Participant {pid}', fontweight='bold', fontsize=12)
-            axes[i].set_ylabel('Heart Rate (bpm)', fontsize=11)
-            axes[i].grid(alpha=0.3)
-            
-            # Add mean line
-            mean_hr = df_p[hr_col].mean()
-            axes[i].axhline(mean_hr, color='red', linestyle='--', 
-                           alpha=0.5, label=f'Mean={mean_hr:.1f}')
-            axes[i].legend(loc='upper right', fontsize=9)
-        
-        # Remove empty subplots
-        for j in range(i+1, len(axes)):
-            fig.delaxes(axes[j])
-        
-        fig.text(0.5, 0.02, 'Day in Study', ha='center', fontsize=14, fontweight='bold')
-        fig.suptitle('Heart Rate Patterns Across Participants',
-                    fontsize=16, fontweight='bold', y=0.995)
-        
-        plt.tight_layout()
-        plt.savefig(save_path, dpi=300, bbox_inches='tight')
-        print(f"✓ Saved to {save_path}")
-        plt.show()
-    
-    # =====================================================
-    # VISUALIZATION 6: Circadian Rhythm Analysis
-    # =====================================================
-    
-    def plot_circadian_patterns(self, save_path='circadian_patterns.png'):
-        """
-        Analyzes hourly HR patterns if hour_of_day exists.
-        Shows daily rhythm variations across cycle phases.
-        """
-        print("\n📊 Creating Circadian Pattern Analysis...")
-        
-        if 'hour_of_day' not in self.df.columns:
-            print("⚠ No hour_of_day column found - skipping circadian analysis")
-            return
-        
-        hr_col = 'hr_mean' if 'hr_mean' in self.df.columns else 'heart_rate'
-        
-        fig, axes = plt.subplots(2, 2, figsize=(16, 12))
-        
-        # 1. Average HR by hour
-        hourly_hr = self.df.groupby('hour_of_day')[hr_col].agg(['mean', 'sem'])
-        axes[0, 0].plot(hourly_hr.index, hourly_hr['mean'], 
-                       linewidth=3, marker='o', markersize=8, color='darkblue')
-        axes[0, 0].fill_between(hourly_hr.index,
-                               hourly_hr['mean'] - hourly_hr['sem'],
-                               hourly_hr['mean'] + hourly_hr['sem'],
-                               alpha=0.3)
-        axes[0, 0].set_xlabel('Hour of Day', fontsize=12)
-        axes[0, 0].set_ylabel('Mean Heart Rate (bpm)', fontsize=12)
-        axes[0, 0].set_title('24-Hour Heart Rate Pattern (Average)',
-                            fontweight='bold', fontsize=14)
-        axes[0, 0].set_xticks(range(0, 24, 2))
-        axes[0, 0].grid(alpha=0.3)
-        
-        # Add day/night shading
-        axes[0, 0].axvspan(0, 6, alpha=0.1, color='blue', label='Sleep')
-        axes[0, 0].axvspan(22, 24, alpha=0.1, color='blue')
-        axes[0, 0].legend()
-        
-        # 2. Heatmap of HR by hour and day
-        if 'day_in_study' in self.df.columns:
-            pivot_data = self.df.pivot_table(
-                values=hr_col,
-                index='hour_of_day',
-                columns='day_in_study',
-                aggfunc='mean'
-            )
-            
-            sns.heatmap(pivot_data, cmap='YlOrRd', ax=axes[0, 1],
-                       cbar_kws={'label': 'Heart Rate (bpm)'})
-            axes[0, 1].set_title('Heart Rate: Hour × Day Heatmap',
-                                fontweight='bold', fontsize=14)
-            axes[0, 1].set_xlabel('Day in Study', fontsize=12)
-            axes[0, 1].set_ylabel('Hour of Day', fontsize=12)
-        
-        # 3. HR by hour, colored by cycle phase
-        if 'cycle_phase' in self.df.columns or 'phase' in self.df.columns:
-            phase_col = 'cycle_phase' if 'cycle_phase' in self.df.columns else 'phase'
-            
-            for phase in self.df[phase_col].unique():
-                phase_data = self.df[self.df[phase_col] == phase]
-                hourly = phase_data.groupby('hour_of_day')[hr_col].mean()
-                axes[1, 0].plot(hourly.index, hourly.values,
-                               linewidth=2, marker='o', label=phase)
-            
-            axes[1, 0].set_xlabel('Hour of Day', fontsize=12)
-            axes[1, 0].set_ylabel('Mean Heart Rate (bpm)', fontsize=12)
-            axes[1, 0].set_title('Circadian Patterns by Cycle Phase',
-                                fontweight='bold', fontsize=14)
-            axes[1, 0].legend()
-            axes[1, 0].set_xticks(range(0, 24, 2))
-            axes[1, 0].grid(alpha=0.3)
-        
-        # 4. Peak detection
-        hourly_avg = self.df.groupby('hour_of_day')[hr_col].mean()
-        peaks, properties = find_peaks(hourly_avg.values, prominence=1)
-        
-        axes[1, 1].plot(hourly_avg.index, hourly_avg.values,
-                       linewidth=3, color='darkgreen', label='HR Pattern')
-        axes[1, 1].plot(hourly_avg.index[peaks], hourly_avg.values[peaks],
-                       'ro', markersize=12, label=f'Peaks (n={len(peaks)})')
-        axes[1, 1].set_xlabel('Hour of Day', fontsize=12)
-        axes[1, 1].set_ylabel('Mean Heart Rate (bpm)', fontsize=12)
-        axes[1, 1].set_title('Peak Heart Rate Hours',
-                            fontweight='bold', fontsize=14)
-        axes[1, 1].legend()
-        axes[1, 1].set_xticks(range(0, 24, 2))
-        axes[1, 1].grid(alpha=0.3)
-        
-        plt.tight_layout()
-        plt.savefig(save_path, dpi=300, bbox_inches='tight')
-        print(f"✓ Saved to {save_path}")
-        plt.show()
-    
-    # =====================================================
-    # MASTER FUNCTION: Generate All Visualizations
-    # =====================================================
-    
-    def generate_all_visualizations(self, output_dir='visualizations'):
-        """
-        Generate all visualizations at once.
-        Perfect for meeting project requirements!
-        """
-        import os
-        os.makedirs(output_dir, exist_ok=True)
-        
-        print("\n" + "="*60)
-        print("GENERATING COMPREHENSIVE VISUALIZATION SUITE")
-        print("="*60)
-        
-        viz_functions = [
-            (self.plot_hr_by_cycle_phase, f'{output_dir}/01_hr_by_phase.png'),
-            (self.plot_hr_hormone_timeseries, f'{output_dir}/02_hr_hormone_timeseries.png'),
-            (self.plot_correlation_matrix, f'{output_dir}/03_correlation_heatmap.png'),
-            (self.plot_hrv_analysis, f'{output_dir}/04_hrv_analysis.png'),
-            (self.plot_participant_comparison, f'{output_dir}/05_participant_comparison.png'),
-            (self.plot_circadian_patterns, f'{output_dir}/06_circadian_patterns.png'),
-        ]
-        
-        for i, (func, path) in enumerate(viz_functions, 1):
-            try:
-                print(f"\n[{i}/{len(viz_functions)}] ", end='')
-                func(save_path=path)
-            except Exception as e:
-                print(f"⚠ Error: {str(e)}")
+        return chart
 # --- Load cleaned data ---
 @st.cache_data
 def load_data():
