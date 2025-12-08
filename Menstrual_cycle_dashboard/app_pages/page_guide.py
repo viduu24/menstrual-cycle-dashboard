@@ -8,14 +8,14 @@ def show_guide():
     with tab1:
         st.subheader("Recommended Input Ranges — Phase Prediction")
         st.markdown("""
-### 🧪 **Hormones**
+### **Hormones**
 | Hormone | Follicular | Fertility | Luteal | Notes |
 |--------|------------|-----------|--------|-------|
 | **Estrogen (pg/mL)** | 30–120 | **150–350** | 50–150 | Peaks before ovulation |
 | **PDG (ng/mL)** | < 5 | 2–10 | **10–25** | High after ovulation |
 | **LH (mIU/mL)** | 2–10 | **20–80** | 1–10 | Spikes during ovulation |
 
-### ⏳ **Cycle Day**
+### **Cycle Day**
 - Range: **1–28**
 
 ### **Heart Rate Inputs**
