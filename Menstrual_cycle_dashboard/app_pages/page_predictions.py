@@ -32,19 +32,35 @@ def show_predictions(models):
     
     with tab1:
         st.header("📌 Phase Prediction")
-        st.markdown("Use hormone + cycle features to predict: **Menstrual, Follicular, Fertile, Luteal**")
-        
+        st.markdown("Enter your cycle + hormone inputs to predict the current menstrual phase.")
+    
+        # --- Only ask the user for the features they actually need to provide ---
+        user_features = ["cycle_day", "normalized_cycle_day", "estrogen", "pdg", "hr_mean"]
+    
         user_input = {}
-        for feat in m2_features:
+        for feat in user_features:
             user_input[feat] = st.number_input(f"{feat}", value=0.0)
-        
+    
         if st.button("Predict Phase"):
-            X = pd.DataFrame([user_input])
+            # Create full feature vector with placeholders (0) for non-user features
+            X = {}
+    
+            for feat in m2_features:
+                if feat in user_input:
+                    X[feat] = user_input[feat]
+                else:
+                    # Model requires these features, but user does not input them
+                    X[feat] = 0.0   # default placeholder
+    
+            X = pd.DataFrame([X])
+    
+            # Scale + predict
             X_scaled = m2_scaler.transform(X)
             pred_encoded = m2_model.predict(X_scaled)[0]
             pred_phase = m2_encoder.inverse_transform([pred_encoded])[0]
-            
+    
             st.success(f"### 🎯 Predicted Phase: **{pred_phase}**")
+
     
     with tab2:
         st.header("📌 Cycle Length Prediction")
