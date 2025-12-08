@@ -1,9 +1,6 @@
 import streamlit as st
 import pandas as pd
 import altair as alt
-import seaborn as sns
-import matplotlib.pyplot as plt
-import plotly.express as px
 import os
 from Menstrual_cycle_dashboard.utils.data_loader import load_data
 from Menstrual_cycle_dashboard.utils.visualization import MenstrualCycleVisualizer
@@ -37,23 +34,49 @@ def show(period_1, period_2, period_3):
         # 1️⃣ Age Distribution
         if plot_type == "Age Distribution":
             st.subheader("Age Distribution")
-            fig, ax = plt.subplots(figsize=(8,4))
-            sns.histplot(df.groupby("ClientID")["Age"].first(), bins=20, kde=True, ax=ax)
-            ax.set_title("Distribution of Age")
-            ax.set_xlabel("Age")
-            ax.set_ylabel("Count")
-            st.pyplot(fig)
+            age_df = df.groupby("ClientID")["Age"].first().reset_index()
+            
+            age_chart = alt.Chart(age_df).mark_bar(
+                color='#3b82f6',
+                opacity=0.7
+            ).encode(
+                alt.X('Age:Q', bin=alt.Bin(maxbins=20), title='Age'),
+                alt.Y('count()', title='Count'),
+                tooltip=[
+                    alt.Tooltip('Age:Q', bin=alt.Bin(maxbins=20), title='Age'),
+                    alt.Tooltip('count()', title='Count')
+                ]
+            ).properties(
+                width=600,
+                height=400,
+                title='Distribution of Age'
+            ).interactive()
+            
+            st.altair_chart(age_chart, use_container_width=True)
             st.markdown("The above graph shows the age distribution of the dataset.")
             
         # 2️⃣ BMI Distribution
         elif plot_type == "BMI Distribution":
             st.subheader("BMI Distribution")
-            fig, ax = plt.subplots(figsize=(8,4))
-            sns.histplot(df.groupby('ClientID')["BMI"].first(), bins=20, kde=True, ax=ax)
-            ax.set_title("Distribution of BMI")
-            ax.set_xlabel("BMI")
-            ax.set_ylabel("Count")
-            st.pyplot(fig)
+            bmi_df = df.groupby('ClientID')["BMI"].first().reset_index()
+            
+            bmi_chart = alt.Chart(bmi_df).mark_bar(
+                color='#10b981',
+                opacity=0.7
+            ).encode(
+                alt.X('BMI:Q', bin=alt.Bin(maxbins=20), title='BMI'),
+                alt.Y('count()', title='Count'),
+                tooltip=[
+                    alt.Tooltip('BMI:Q', bin=alt.Bin(maxbins=20), title='BMI'),
+                    alt.Tooltip('count()', title='Count')
+                ]
+            ).properties(
+                width=600,
+                height=400,
+                title='Distribution of BMI'
+            ).interactive()
+            
+            st.altair_chart(bmi_chart, use_container_width=True)
             st.markdown("The above graph shows the BMI distribution of the dataset.")
             
         # 3️⃣ Cycle Length Distribution
@@ -151,24 +174,28 @@ not at the expected time, don't worry!
                 menses_avg = df[menses_cols].mean()
                 menses_data = pd.DataFrame({
                     'Day': [f'Day {i+1}' for i in range(len(menses_avg))],
-                    'Average Score': menses_avg.values
+                    'Day_Number': list(range(1, len(menses_avg) + 1)),
+                    'Average_Score': menses_avg.values
                 })
                 
-                fig = px.line(
-                    menses_data,
-                    x='Day',
-                    y='Average Score',
-                    title='Average Bleeding Intensity Over Menses Days',
-                    markers=True
-                )
+                line_chart = alt.Chart(menses_data).mark_line(
+                    color='#ef4444',
+                    strokeWidth=3,
+                    point=alt.OverlayMarkDef(filled=True, size=100)
+                ).encode(
+                    x=alt.X('Day:N', title='Day', sort=None),
+                    y=alt.Y('Average_Score:Q', title='Average Bleeding Intensity Score'),
+                    tooltip=[
+                        alt.Tooltip('Day:N', title='Day'),
+                        alt.Tooltip('Average_Score:Q', title='Average Score', format='.2f')
+                    ]
+                ).properties(
+                    width=600,
+                    height=400,
+                    title='Average Bleeding Intensity Over Menses Days'
+                ).interactive()
                 
-                fig.update_traces(
-                    line=dict(color='#ef4444', width=3),
-                    marker=dict(size=10)
-                )
-                fig.update_layout(height=500, template="plotly_white")
-                
-                st.plotly_chart(fig, use_container_width=True)
+                st.altair_chart(line_chart, use_container_width=True)
                 st.markdown("""
 From this line chart we can tell that the maximum bleeding is on day 2 of period for most women (It is important that you take rest and understand what your body needs). Most women menstruate for up to 6 days.
                 """)
@@ -354,3 +381,14 @@ From this line chart we can tell that the maximum bleeding is on day 2 of period
         elif plot_type == "Participant Comparison":
             viz.plot_participant_comparison(save_path="merged_participants.png")
             st.image("merged_participants.png")
+
+
+def decode_phase(phase_code):
+    """Helper function to decode phase numbers to phase names"""
+    phase_map = {
+        0: 'Follicular',
+        1: 'Fertility',
+        2: 'Luteal',
+        3: 'Menstrual'
+    }
+    return phase_map.get(phase_code, 'Unknown')
