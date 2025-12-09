@@ -627,7 +627,7 @@ From this line chart we can tell that the maximum bleeding is on day 2 of period
             # Map phase for color
             phase_mapping = {0: 'Follicular', 1: 'Fertility', 2: 'Luteal', 3: 'Menstrual'}
             df_merged['phase_name'] = df_merged['phase_encoded'].map(phase_mapping)
-            
+            df_plot = df_merged.dropna(subset=['phase_name'])
             # HR vs Estrogen scatter
             scatter_estrogen = alt.Chart(df_merged).mark_circle(
                 size=60,
