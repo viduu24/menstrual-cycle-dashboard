@@ -347,7 +347,6 @@ From this line chart we can tell that the maximum bleeding is on day 2 of period
                 [
                     "Heart Rate by Cycle Phase",
                     "HR & Hormones Over Time",
-                    "Heart Rate Variability",
                     "HR vs Hormones Correlation"
                 ]
             )
