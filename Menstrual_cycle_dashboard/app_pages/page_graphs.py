@@ -341,7 +341,7 @@ From this line chart we can tell that the maximum bleeding is on day 2 of period
         st.header("Merged Dataset Visualizations")
         
         with st.sidebar:
-            st.subheader("🔍 Choose Visualization (Merged)")
+            st.subheader("Choose Visualization (Merged)")
             plot_type = st.radio(
                 "Select a visualization:",
                 [
