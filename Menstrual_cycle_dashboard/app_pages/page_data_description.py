@@ -184,8 +184,6 @@ def show(period_1, period_2, period_3):
             )
             fig.update_layout(title_x=0.5)
             st.plotly_chart(fig, use_container_width=True)
-            st.markdown("""Some rows appear blank in the correlation heatmap because the original categorical columns were still present in the dataframe even after encoding. Since non-numeric columns cannot produce valid correlations, they show up as empty rows in the plot. The encoded numeric versions of these variables do appear correctly, but the original categorical columns contribute only NaN values, which makes the heatmap look like it has missing rows.
-            """)
-
+            
         else:
             st.info("No heart-rate columns found.")
