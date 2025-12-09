@@ -68,12 +68,12 @@ def show(period_1, period_2, period_3):
     # 📌 CORRELATION MATRIX (NEW)
     # ----------------------------------------------------------
     numeric_cols = df.select_dtypes(include=['float64', 'int64']).columns
-
+    
     st.subheader("Correlation Matrix (Numerical Variables Only)")
-
+    
     if len(numeric_cols) >= 2:
         corr = df[numeric_cols].corr()
-
+    
         fig = px.imshow(
             corr,
             text_auto=False,
@@ -82,11 +82,24 @@ def show(period_1, period_2, period_3):
             title="Correlation Heatmap"
         )
         fig.update_layout(title_x=0.5, height=600)
-
+    
         st.plotly_chart(fig, use_container_width=True)
+    
+        # 🔍 SHOW EXPLANATION **ONLY FOR MERGED DATASET**
+        if dataset.startswith("Merged"):
+            st.markdown("""
+            **Why do some rows look blank in the correlation heatmap?**  
+            This issue is specific to the merged dataset.  
+            Even though categorical variables were encoded, the *original* non-numeric
+            columns still remain in the dataframe. Because non-numeric columns cannot form
+            correlations, they appear as empty rows in the heatmap.  
+            The encoded numeric versions show the correct correlations, but the original
+            strings contribute only NaN values, which look blank in the plot.
+            """)
+    
     else:
         st.info("Not enough numeric columns to compute correlation matrix.")
-
+    
     st.markdown("---")
 
     # ----------------------------------------------------------
