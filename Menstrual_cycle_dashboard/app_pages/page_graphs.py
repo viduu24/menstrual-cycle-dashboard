@@ -393,7 +393,7 @@ From this line chart we can tell that the maximum bleeding is on day 2 of period
         
         # 2️⃣ HR & Hormones Over Time
         elif plot_type == "HR & Hormones Over Time":
-            st.subheader("📊 Heart Rate & Hormones Time Series")
+            st.subheader("Heart Rate & Hormones Time Series")
             
             # Select a participant
             available_ids = df_merged['id'].unique()
