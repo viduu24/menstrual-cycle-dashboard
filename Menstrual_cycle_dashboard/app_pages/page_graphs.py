@@ -13,10 +13,10 @@ def show(period_1, period_2, period_3):
     )
     
     if dataset == "Kaggle":
-        st.header("📊 Period 1 Data Visualizations")
+        st.header("Period 1 Data Visualizations")
         
         with st.sidebar:
-            st.subheader("🔍 Choose Visualization")
+            st.subheader("Choose Visualization")
             plot_type = st.radio(
                 "Select a visualization:",
                 [
@@ -81,7 +81,7 @@ def show(period_1, period_2, period_3):
             
         # 3️⃣ Cycle Length Distribution
         elif plot_type == "Cycle Length Distribution":
-            st.subheader("📊 Cycle Length Distribution")
+            st.subheader("Cycle Length Distribution")
             df_cycle = df.dropna(subset=['LengthofCycle'])
             
             hist_cycle = alt.Chart(df_cycle).mark_bar(
@@ -104,7 +104,7 @@ def show(period_1, period_2, period_3):
             
         # 4️⃣ Age vs Cycle Length (Box Plot)
         elif plot_type == 'Age vs Cycle Length (Box Plot)':
-            st.subheader("📦 Cycle Length by Age Group")
+            st.subheader("Cycle Length by Age Group")
             df_age = df.dropna(subset=['Age', 'LengthofCycle']).copy()
             df_age['AgeGroup'] = pd.cut(
                 df_age['Age'],
@@ -142,7 +142,7 @@ not at the expected time, don't worry!
             
         # 5️⃣ Luteal Phase Length Distribution
         elif plot_type == "Luteal Phase Length Distribution":
-            st.subheader("📊 Luteal Phase Length Distribution")
+            st.subheader("Luteal Phase Length Distribution")
             df_luteal = df.dropna(subset=['LengthofLutealPhase'])
             
             hist_luteal = alt.Chart(df_luteal).mark_bar(
@@ -165,7 +165,7 @@ not at the expected time, don't worry!
             
         # 6️⃣ Average Bleeding Intensity
         elif plot_type == "Average Bleeding Intensity":
-            st.subheader("📊 Average Bleeding Intensity Over Menses Days")
+            st.subheader("Average Bleeding Intensity Over Menses Days")
             menses_cols = [f'MensesScoreDay{day}' for day in 
                           ['One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten']]
             menses_cols = [col for col in menses_cols if col in df.columns]
@@ -204,7 +204,7 @@ From this line chart we can tell that the maximum bleeding is on day 2 of period
     
     elif dataset == "Hormones+symptoms":
         with st.sidebar:
-            st.subheader("🔍 Choose Visualization")
+            st.subheader("Choose Visualization")
             plot_type = st.radio(
                 "Select a visualization:",
                 [
@@ -219,7 +219,7 @@ From this line chart we can tell that the maximum bleeding is on day 2 of period
         
         # 1. Estrogen Levels by Cycle Phase
         if plot_type == "Estrogen Levels by Cycle Phase":
-            st.subheader("📊 Estrogen Levels by Cycle Phase")
+            st.subheader("Estrogen Levels by Cycle Phase")
             
             phase_hormones = final_df.groupby('phase_encoded')['estrogen'].mean().reset_index()
             phase_hormones['phase_name'] = phase_hormones['phase_encoded'].apply(decode_phase)
@@ -254,7 +254,7 @@ From this line chart we can tell that the maximum bleeding is on day 2 of period
         
         # 2. LH Levels by Cycle Phase
         elif plot_type == "LH Levels by Cycle Phase":
-            st.subheader("📊 LH Levels by Cycle Phase")
+            st.subheader("LH Levels by Cycle Phase")
             
             phase_hormones = final_df.groupby('phase_encoded')['lh'].mean().reset_index()
             phase_hormones['phase_name'] = phase_hormones['phase_encoded'].apply(decode_phase)
@@ -289,7 +289,7 @@ From this line chart we can tell that the maximum bleeding is on day 2 of period
         
         # 3. All Symptoms Across Phases
         elif plot_type == "All Symptoms Across Phases":
-            st.subheader("📊 All Symptoms Across Cycle Phases - Grouped Comparison")
+            st.subheader("All Symptoms Across Cycle Phases - Grouped Comparison")
             
             symptom_cols = ['headaches_encoded', 'cramps_encoded', 'sorebreasts_encoded', 
                            'fatigue_encoded', 'sleepissue_encoded', 'moodswing_encoded', 
@@ -338,7 +338,7 @@ From this line chart we can tell that the maximum bleeding is on day 2 of period
             st.markdown("During the menstrual phase, most symptoms start to or increase (especially cramps)")
     
     else:
-        st.header("📊 Merged Dataset Visualizations")
+        st.header("Merged Dataset Visualizations")
         
         with st.sidebar:
             st.subheader("🔍 Choose Visualization (Merged)")
@@ -356,7 +356,7 @@ From this line chart we can tell that the maximum bleeding is on day 2 of period
         
         # 1️⃣ Heart Rate by Cycle Phase
         if plot_type == "Heart Rate by Cycle Phase":
-            st.subheader("📊 Heart Rate Distribution by Cycle Phase")
+            st.subheader("Heart Rate Distribution by Cycle Phase")
             
             # Map phase_encoded to phase names
             phase_mapping = {0: 'Follicular', 1: 'Fertility', 2: 'Luteal', 3: 'Menstrual'}
@@ -467,7 +467,7 @@ From this line chart we can tell that the maximum bleeding is on day 2 of period
         
         # 3️⃣ Hormone Levels by Phase
         elif plot_type == "Hormone Levels by Phase":
-            st.subheader("📊 Average Hormone Levels by Cycle Phase")
+            st.subheader("Average Hormone Levels by Cycle Phase")
             
             # Map phase_encoded to phase names
             phase_mapping = {0: 'Follicular', 1: 'Fertility', 2: 'Luteal', 3: 'Menstrual'}
@@ -514,7 +514,7 @@ From this line chart we can tell that the maximum bleeding is on day 2 of period
         
         # 4️⃣ Symptoms by Phase
         elif plot_type == "Symptoms by Phase":
-            st.subheader("📊 Common Symptoms Across Cycle Phases")
+            st.subheader("Common Symptoms Across Cycle Phases")
             
             # Map phase_encoded to phase names
             phase_mapping = {0: 'Follicular', 1: 'Fertility', 2: 'Luteal', 3: 'Menstrual'}
@@ -562,7 +562,7 @@ From this line chart we can tell that the maximum bleeding is on day 2 of period
         
         # 5️⃣ Heart Rate Variability
         elif plot_type == "Heart Rate Variability":
-            st.subheader("📊 Heart Rate Variability (HRV) Analysis")
+            st.subheader("Heart Rate Variability (HRV) Analysis")
             
             # HRV distribution
             hrv_hist = alt.Chart(df_merged).mark_bar(
@@ -623,7 +623,7 @@ From this line chart we can tell that the maximum bleeding is on day 2 of period
         
         # 6️⃣ HR vs Hormones Correlation
         elif plot_type == "HR vs Hormones Correlation":
-            st.subheader("📊 Heart Rate vs Hormone Levels")
+            st.subheader("Heart Rate vs Hormone Levels")
             
             # Map phase for color
             phase_mapping = {0: 'Follicular', 1: 'Fertility', 2: 'Luteal', 3: 'Menstrual'}
