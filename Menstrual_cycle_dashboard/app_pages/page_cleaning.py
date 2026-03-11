@@ -15,6 +15,7 @@ def show():
             "Overview", 
             "Phase 1: Demographics", 
             "Phase 2: Cycle Variables",
+            "Validation & Quality Checks"
         ])
         
         with tabs[0]:
