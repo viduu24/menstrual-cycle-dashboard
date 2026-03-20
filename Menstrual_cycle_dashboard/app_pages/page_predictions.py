@@ -3,13 +3,30 @@ import pandas as pd
 import joblib
 import os
 
+def patch_tree_model(model):
+    # patch the main model
+    if not hasattr(model, "monotonic_cst"):
+        model.monotonic_cst = None
+
+    # patch all trees inside RandomForest
+    if hasattr(model, "estimators_"):
+        for est in model.estimators_:
+            if not hasattr(est, "monotonic_cst"):
+                est.monotonic_cst = None
+
+    # extra safety
+    if hasattr(model, "estimator_"):
+        if not hasattr(model.estimator_, "monotonic_cst"):
+            model.estimator_.monotonic_cst = None
+
+    return model
 
 # =============================
 # MAIN PREDICTION FUNCTION
 # =============================
 def show_predictions():
 
-    st.title(" Machine Learning Models")
+    st.title("Machine Learning Models")
     st.markdown("Explore predictions from your trained ML models — Phase & Cycle Length.")
 
     base_path = os.path.dirname(os.path.dirname(__file__))
@@ -28,6 +45,8 @@ def show_predictions():
         m2_features = load_pkl("model2_features.pkl")
 
         m3_model = load_pkl("model3_cycle_length.pkl")
+        m3_model = patch_tree_model(m3_model)
+
         m3_scaler = load_pkl("model3_scaler.pkl")
         m3_features = load_pkl("model3_features.pkl")
 
@@ -40,14 +59,13 @@ def show_predictions():
     # -------------------------------
     # TABS
     # -------------------------------
-    tab1, tab2 = st.tabs([" Phase Prediction (Model 1)", " Cycle Length Prediction (Model 2)"])
-
+    tab1, tab2 = st.tabs(["Phase Prediction (Model 1)", "Cycle Length Prediction (Model 2)"])
 
     # =======================================================
     # MODEL 2 — PHASE PREDICTION
     # =======================================================
     with tab1:
-        st.header(" Phase Prediction")
+        st.header("Phase Prediction")
         st.markdown("Enter your values to predict the menstrual cycle phase.")
 
         cycle_day = st.number_input("Cycle Day (1–28)", min_value=1, max_value=28, value=1)
@@ -57,10 +75,8 @@ def show_predictions():
 
         if st.button("Predict Phase"):
 
-            # compute hidden engineered feature
             normalized_cycle_day = (cycle_day - 1) / 27
 
-            # create full feature vector matching the training order
             X = {}
             for feat in m2_features:
                 if feat == "cycle_day":
@@ -74,7 +90,6 @@ def show_predictions():
                 elif feat == "hr_mean":
                     X[feat] = hr_mean
                 else:
-                    # engineered features not entered by user
                     X[feat] = 0.0
 
             X = pd.DataFrame([X])
@@ -83,14 +98,13 @@ def show_predictions():
             pred_encoded = m2_model.predict(X_scaled)[0]
             pred_phase = m2_encoder.inverse_transform([pred_encoded])[0]
 
-            st.success(f"###  Predicted Phase: **{pred_phase}**")
-
+            st.success(f"### Predicted Phase: **{pred_phase}**")
 
     # =======================================================
     # MODEL 3 — CYCLE LENGTH PREDICTION
     # =======================================================
     with tab2:
-        st.header(" Cycle Length Prediction")
+        st.header("Cycle Length Prediction")
 
         user_cycle = {}
         for feat in m3_features:
@@ -102,7 +116,6 @@ def show_predictions():
             pred = m3_model.predict(X_scaled)[0]
 
             st.success(f"### 📏 Predicted Cycle Length: **{pred:.1f} days**")
-
 
 # =============================
 # ENTRYPOINT CALLED BY APP
