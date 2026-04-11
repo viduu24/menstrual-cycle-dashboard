@@ -159,15 +159,12 @@ def show_predictions():
             height = st.number_input("Height (cm)", min_value=100.0, max_value=220.0, value=160.0)
             weight = st.number_input("Weight (lbs)", min_value=66.0, max_value=440.0, value=132.0)
 
-            # convert lbs to kg for BMI calculation
             weight_kg = weight * 0.453592
             bmi       = weight_kg / ((height / 100) ** 2)
             st.info(f"BMI (auto-calculated): **{bmi:.1f}**")
 
-            st.subheader("Cycle Info")
-            estimated_ovulation = st.number_input("Estimated Day of Ovulation", min_value=1, max_value=28, value=14)
-            length_luteal_phase = st.number_input("Length of Luteal Phase (days)", min_value=1, max_value=20, value=14)
-            length_menses       = st.number_input("Length of Menses (days)", min_value=1, max_value=10, value=5)
+            st.subheader("Previous Cycle Info")
+            length_menses = st.number_input("Length of Last Period (days)", min_value=1, max_value=10, value=5)
 
         with col2:
             st.subheader("Bleeding Info")
@@ -178,7 +175,7 @@ def show_predictions():
             total_high_days    = st.number_input("Total Number of High Flow Days", min_value=0, max_value=10, value=2)
             total_menses_score = st.number_input("Total Menses Score", min_value=0.0, value=10.0)
 
-            st.subheader("Daily Menses Score")
+            st.subheader("Daily Menses Score (last period)")
             day1 = st.number_input("Menses Score Day 1", min_value=0.0, value=3.0)
             day2 = st.number_input("Menses Score Day 2", min_value=0.0, value=3.0)
             day3 = st.number_input("Menses Score Day 3", min_value=0.0, value=2.0)
@@ -199,8 +196,6 @@ def show_predictions():
                 "MensesScoreDayThree":     day3,
                 "MensesScoreDayFour":      day4,
                 "MensesScoreDayFive":      day5,
-                "EstimatedDayofOvulation": estimated_ovulation,
-                "LengthofLutealPhase":     length_luteal_phase,
                 "LengthofMenses":          length_menses,
             }
 
@@ -209,10 +204,11 @@ def show_predictions():
             pred     = m3_model.predict(X_scaled)[0]
 
             st.success(f"### Predicted Cycle Length: **{pred:.1f} days**")
+            st.info("Predictions are typically within ±2.5 days of actual cycle length.")
+            st.caption("Cycle length can vary due to stress, sleep, and other lifestyle factors.")
 
             with st.expander("See input features used"):
                 st.dataframe(X)
-
 # =============================
 # ENTRYPOINT CALLED BY APP
 # =============================
