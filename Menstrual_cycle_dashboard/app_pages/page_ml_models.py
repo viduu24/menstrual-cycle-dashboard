@@ -48,7 +48,7 @@ def show():
             st.metric("Model Type", "Classification")
             st.metric("Trees", "180")
             st.metric("Classes", "4")
-            st.metric("Accuracy", "43%")
+            st.metric("Accuracy", "70.21%")
         
         st.subheader("Input Features (Simplified)")
         features_m2 = pd.DataFrame({
