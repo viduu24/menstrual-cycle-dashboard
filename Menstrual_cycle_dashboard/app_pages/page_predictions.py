@@ -16,9 +16,6 @@ def patch_tree_model(model):
             model.estimator_.monotonic_cst = None
     return model
 
-# =============================
-# MAIN PREDICTION FUNCTION
-# =============================
 def show_predictions():
 
     st.title("Machine Learning Models")
@@ -30,18 +27,15 @@ def show_predictions():
     def load_pkl(name):
         return joblib.load(os.path.join(model_dir, name))
 
-    # -------------------------------
-    # Load models safely
-    # -------------------------------
     try:
-        m2_model   = load_pkl("model2_phase_prediction.pkl")
-        m2_scaler  = load_pkl("model2_scaler.pkl")
-        m2_encoder = load_pkl("model2_encoder.pkl")
+        m2_model    = load_pkl("model2_phase_prediction.pkl")
+        m2_scaler   = load_pkl("model2_scaler.pkl")
+        m2_encoder  = load_pkl("model2_encoder.pkl")
         m2_features = load_pkl("model2_features.pkl")
 
-        m3_model   = load_pkl("model3_cycle_length.pkl")
-        m3_model   = patch_tree_model(m3_model)
-        m3_scaler  = load_pkl("model3_scaler.pkl")
+        m3_model    = load_pkl("model3_cycle_length.pkl")
+        m3_model    = patch_tree_model(m3_model)
+        m3_scaler   = load_pkl("model3_scaler.pkl")
         m3_features = load_pkl("model3_features.pkl")
 
         st.success("Models loaded successfully!")
@@ -50,13 +44,10 @@ def show_predictions():
         st.error(f"❌ Failed to load ML models.\nError: {e}")
         st.stop()
 
-    # -------------------------------
-    # TABS
-    # -------------------------------
     tab1, tab2 = st.tabs(["Phase Prediction (Model 1)", "Cycle Length Prediction (Model 2)"])
 
     # =======================================================
-    # MODEL 2 — PHASE PREDICTION
+    # MODEL 1 — PHASE PREDICTION
     # =======================================================
     with tab1:
         st.header("Phase Prediction")
@@ -145,11 +136,11 @@ def show_predictions():
                 st.dataframe(X)
 
     # =======================================================
-    # MODEL 3 — CYCLE LENGTH PREDICTION
+    # MODEL 2 — CYCLE LENGTH PREDICTION
     # =======================================================
     with tab2:
         st.header("Cycle Length Prediction")
-        st.markdown("Enter your details to predict your menstrual cycle length.")
+        st.markdown("Enter your details from your **previous cycle** to predict your next cycle length.")
 
         col1, col2 = st.columns(2)
 
@@ -164,10 +155,12 @@ def show_predictions():
             st.info(f"BMI (auto-calculated): **{bmi:.1f}**")
 
             st.subheader("Previous Cycle Info")
-            length_menses = st.number_input("Length of Last Period (days)", min_value=1, max_value=10, value=5)
+            estimated_ovulation = st.number_input("Estimated Day of Ovulation (last cycle)", min_value=1, max_value=28, value=14)
+            length_luteal_phase = st.number_input("Length of Luteal Phase last cycle (days)", min_value=1, max_value=20, value=14)
+            length_menses       = st.number_input("Length of Last Period (days)", min_value=1, max_value=10, value=5)
 
         with col2:
-            st.subheader("Bleeding Info")
+            st.subheader("Bleeding Info (last period)")
             bleed_options = ["Very Light", "Light", "Moderate", "Heavy", "Very Heavy"]
             bleed_map     = {"Very Light": 1, "Light": 2, "Moderate": 3, "Heavy": 4, "Very Heavy": 5}
 
@@ -184,19 +177,21 @@ def show_predictions():
 
         if st.button("Predict Cycle Length"):
             feature_values = {
-                "Age":                     age,
-                "BMI":                     bmi,
-                "Height":                  height,
-                "Weight":                  weight_kg,
-                "MeanBleedingIntensity":   bleed_map[mean_bleeding],
-                "TotalNumberofHighDays":   total_high_days,
-                "TotalMensesScore":        total_menses_score,
-                "MensesScoreDayOne":       day1,
-                "MensesScoreDayTwo":       day2,
-                "MensesScoreDayThree":     day3,
-                "MensesScoreDayFour":      day4,
-                "MensesScoreDayFive":      day5,
-                "LengthofMenses":          length_menses,
+                "Age":                      age,
+                "BMI":                      bmi,
+                "Height":                   height,
+                "Weight":                   weight_kg,
+                "MeanBleedingIntensity":    bleed_map[mean_bleeding],
+                "TotalNumberofHighDays":    total_high_days,
+                "TotalMensesScore":         total_menses_score,
+                "MensesScoreDayOne":        day1,
+                "MensesScoreDayTwo":        day2,
+                "MensesScoreDayThree":      day3,
+                "MensesScoreDayFour":       day4,
+                "MensesScoreDayFive":       day5,
+                "EstimatedDayofOvulation":  estimated_ovulation,
+                "LengthofLutealPhase":      length_luteal_phase,
+                "LengthofMenses":           length_menses,
             }
 
             X        = pd.DataFrame([{f: feature_values.get(f, 0.0) for f in m3_features}])
@@ -204,13 +199,10 @@ def show_predictions():
             pred     = m3_model.predict(X_scaled)[0]
 
             st.success(f"### Predicted Cycle Length: **{pred:.1f} days**")
-            st.info("Predictions are typically within ±2.5 days of actual cycle length.")
             st.caption("Cycle length can vary due to stress, sleep, and other lifestyle factors.")
 
             with st.expander("See input features used"):
                 st.dataframe(X)
-# =============================
-# ENTRYPOINT CALLED BY APP
-# =============================
+
 def show(models=None):
     show_predictions()
