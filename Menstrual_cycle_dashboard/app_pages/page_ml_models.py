@@ -6,7 +6,7 @@ def show():
     st.markdown("---")
     
     st.markdown("""
-    This dashboard uses three specialized machine learning models to provide predictions 
+    This dashboard uses two specialized machine learning models to provide predictions 
     and insights about menstrual cycle patterns. Each model is trained on real data and 
     optimized for accuracy while maintaining ease of use.
     """)
@@ -25,7 +25,7 @@ def show():
             st.subheader("Overview")
             st.markdown("""
             Identifies which phase of your menstrual cycle you're currently in based on 
-            physiological measurements and hormone levels.
+            physiological measurements, hormone levels, and symptoms.
             """)
             
             st.subheader("Purpose")
@@ -41,7 +41,7 @@ def show():
             - **Algorithm**: XGBoost Classifier
             - **Parameters**: 180 trees, learning rate 0.12
             - **Classes**: Follicular, Fertility, Luteal, Menstrual
-            - **Optimization**: High accuracy with minimal user inputs
+            - **Performance**: 70.21% accuracy
             """)
         
         with col2:
@@ -50,33 +50,59 @@ def show():
             st.metric("Classes", "4")
             st.metric("Accuracy", "70.21%")
         
-        st.subheader("Input Features (Simplified)")
+        st.subheader("Input Features")
         features_m2 = pd.DataFrame({
             'Feature': [
-                'cycle_day', 'normalized_cycle_day', 'estrogen', 'pdg',
-                'estrogen_z', 'pdg_z', 'hr_mean', 'hr_lag1', 'hr_rolling_7d', 'phase_lag1'
-            ],
-            'Description': [
-                'Day of cycle (1-28)', 'Normalized cycle position',
-                'Estrogen level', 'Progesterone level',
-                'Z-scored estrogen (standardized)', 'Z-scored progesterone',
-                'Current average heart rate', 'Previous day heart rate',
-                '7-day rolling average heart rate', 'Previous phase (temporal context)'
+                'Cycle Day',
+                'Estrogen (pg/mL)',
+                'PDG / Progesterone (ng/mL)',
+                'LH (mIU/mL)',
+                'Average Heart Rate (bpm)',
+                'Yesterday Heart Rate (bpm)',
+                '7-Day Rolling Heart Rate (bpm)',
+                'Min / Max Heart Rate (bpm)',
+                'Cramps', 'Fatigue', 'Bloating', 'Mood Swings', 'Sore Breasts',
+                'Derived features'
             ],
             'User Provides?': [
-                '✅ Yes', '❌ Auto-calculated', '✅ Yes', '✅ Yes',
-                '❌ Auto-calculated', '❌ Auto-calculated', '✅ Yes',
-                '❌ Auto-calculated', '❌ Auto-calculated', '❌ Auto-calculated'
+                '✅ Yes',
+                '✅ Yes',
+                '✅ Yes',
+                '✅ Yes',
+                '✅ Yes',
+                '✅ Yes',
+                '✅ Yes',
+                '✅ Yes',
+                '✅ Yes (MCQ)',
+                '✅ Yes (MCQ)',
+                '✅ Yes (MCQ)',
+                '✅ Yes (MCQ)',
+                '✅ Yes (MCQ)',
+                '❌ Auto-calculated'
+            ],
+            'Notes': [
+                'Day 1 = first day of period',
+                'Peaks before ovulation',
+                'Rises after ovulation',
+                'Spikes at ovulation',
+                'From wearable device',
+                'From wearable device',
+                'From wearable device',
+                'Used to calculate HR range',
+                'Very Low/Little to Very High',
+                'Very Low/Little to Very High',
+                'Very Low/Little to Very High',
+                'Very Low/Little to Very High',
+                'Very Low/Little to Very High',
+                'Log transforms, ratios, normalization'
             ]
         })
         st.dataframe(features_m2, use_container_width=True, hide_index=True)
         
-        st.success("**User-Friendly**: Only 4 inputs needed! (cycle_day, estrogen, pdg, hr_mean)")
-        
         st.subheader("Predicted Phases")
         phases = pd.DataFrame({
             'Phase': ['Follicular', 'Fertility', 'Luteal', 'Menstrual'],
-            'Timing': ['Days 1-13', 'Days 14-17', 'Days 18-28', 'Days 1-5'],
+            'Timing': ['Days 1–13', 'Days 14–17', 'Days 18–28', 'Days 1–5'],
             'Characteristics': [
                 'Estrogen rising, preparing for ovulation',
                 'Peak estrogen and LH surge, ovulation occurs',
@@ -98,7 +124,7 @@ def show():
             st.subheader("Overview")
             st.markdown("""
             Predicts the total length of your menstrual cycle based on demographic 
-            information and menstrual characteristics from your previous period. 
+            information and menstrual characteristics from your previous cycle. 
             Helps you anticipate when your next period will begin.
             """)
 
@@ -115,47 +141,55 @@ def show():
             - **Algorithm**: Random Forest Regressor
             - **Parameters**: 200 trees, max depth 10
             - **Training Data**: Kaggle menstrual cycle dataset
-            - **Performance**: MAE of 2.38 days, R² of 0.25
+            - **Performance**: MAE of 0.45 days, R² of 0.88
             """)
 
         with col2:
             st.metric("Model Type", "Regression")
             st.metric("Trees", "200")
             st.metric("Max Depth", "10")
-            st.metric("MAE", "2.38 days")
-            st.metric("R²", "0.25")
+            st.metric("MAE", "0.45 days")
+            st.metric("R²", "0.88")
 
         st.subheader("Input Features")
         features_m3 = pd.DataFrame({
             'Feature': [
                 'Age', 'BMI', 'Height', 'Weight',
-                'MeanBleedingIntensity', 'TotalNumberofHighDays', 'TotalMensesScore',
-                'MensesScoreDay1–5', 'LengthofMenses'
+                'Mean Bleeding Intensity',
+                'Total Number of High Flow Days',
+                'Total Menses Score',
+                'Menses Score Day 1–5',
+                'Estimated Day of Ovulation (last cycle)',
+                'Length of Luteal Phase (last cycle)',
+                'Length of Menses (last cycle)'
             ],
-            'Description': [
-                'Age in years', 'Body Mass Index (auto-calculated)', 
-                'Height in cm', 'Weight (converted from lbs to kg)',
-                'Average bleeding intensity during period',
-                'Number of heavy flow days',
-                'Sum of all daily menses scores',
-                'Bleeding intensity for first 5 days of period',
-                'Number of days period lasted'
+            'User Provides?': [
+                '✅ Yes', '❌ Auto-calculated', '✅ Yes', '✅ Yes (lbs)',
+                '✅ Yes (MCQ)',
+                '✅ Yes',
+                '✅ Yes',
+                '✅ Yes',
+                '✅ Yes',
+                '✅ Yes',
+                '✅ Yes'
             ],
-            'Why Included?': [
-                'Age affects cycle regularity',
-                'BMI correlates with hormonal balance',
-                'Physical characteristics baseline',
-                'Physical characteristics baseline',
-                'Bleeding patterns indicate cycle health',
-                'Heavy flow days reflect hormonal activity',
-                'Overall menstrual characteristics',
-                'Early period pattern affects cycle length',
-                'Period length contributes to total cycle length'
+            'Notes': [
+                'In years',
+                'Calculated from height and weight',
+                'In cm',
+                'Converted to kg automatically',
+                'Very Light to Very Heavy',
+                'Days with heavy bleeding',
+                'Sum of all daily scores',
+                'Score for each of first 5 days',
+                'From your previous completed cycle',
+                'From your previous completed cycle',
+                'From your previous completed cycle'
             ]
         })
         st.dataframe(features_m3, use_container_width=True, hide_index=True)
 
-        st.info("**Note**: Predictions are within ±2.5 days on average. Cycle length can vary due to stress, sleep, and lifestyle factors.")
+        st.info("**Note**: All cycle inputs are based on your previous completed cycle to predict the next one.")
 
         st.subheader("Typical Cycle Lengths")
         st.markdown("""
@@ -165,20 +199,26 @@ def show():
         - **Irregular**: Varies by >7 days between cycles
         """)
 
+    # ====================================================================
+    # COMPARISON SECTION
+    # ====================================================================
     st.markdown("---")
     st.header("Model Comparison")
 
     comparison_df = pd.DataFrame({
-        'Model': ['Model 1: Phase', 'Model 2: Cycle Length'],
+        'Model': ['Model 1: Phase Prediction', 'Model 2: Cycle Length'],
         'Type': ['Classification', 'Regression'],
         'Algorithm': ['XGBoost', 'Random Forest'],
-        'Input Complexity': ['Hormones + symptoms + HR', 'Bleeding info + personal info'],
+        'Inputs': ['Hormones + HR + symptoms', 'Previous cycle data + personal info'],
         'Output': ['Phase name', 'Cycle length (days)'],
-        'Performance': ['70.21% accuracy', 'MAE 2.38 days, R² 0.25'],
+        'Performance': ['70.21% accuracy', 'MAE 0.45 days, R² 0.88'],
         'Use Case': ['Phase tracking', 'Period prediction']
     })
     st.dataframe(comparison_df, use_container_width=True, hide_index=True)
 
+    # ====================================================================
+    # HOW TO USE
+    # ====================================================================
     st.markdown("---")
     st.header("How to Use These Models")
 
@@ -188,15 +228,16 @@ def show():
         st.subheader("Gather Data")
         st.markdown("""
         - Track your cycle day
-        - Measure hormone levels (if available)
+        - Measure hormone levels if available
         - Monitor heart rate with a smartwatch
-        - Note your age, height and weight
+        - Note your age, height, and weight
+        - Record your previous cycle details
         """)
 
     with col2:
         st.subheader("Make Predictions")
         st.markdown("""
-        - Navigate to Predictions page
+        - Navigate to the Predictions page
         - Enter required values
         - Click Predict
         - View results instantly
@@ -205,12 +246,12 @@ def show():
     with col3:
         st.subheader("Understand Results")
         st.markdown("""
-        - Results are estimates within ±2.5 days
-        - Compare with your historical cycles
+        - Phase prediction is 70% accurate
+        - Cycle length predictions within ±0.5 days
         - Track patterns over time
         - Consult a doctor for medical decisions
         """)
-    
+
     # ====================================================================
     # TECHNICAL DETAILS
     # ====================================================================
@@ -234,15 +275,15 @@ def show():
         
         **Evaluation Metrics:**
         - Regression: MAE 0.45 days, R² 0.88
-        - Classification: 43% accuracy across 4 phases
+        - Classification: 70.21% accuracy across 4 phases
         - All models evaluated on held-out test sets
         
         **Feature Engineering:**
-        - Cycle day normalization (0-1 scale)
+        - Cycle day normalization (0–1 scale)
         - Rolling averages for temporal smoothing
         - Lag features for sequential context
-        - Z-score normalization for hormones
         - Log transformations for skewed distributions
+        - Estrogen/PDG ratio for hormonal balance
         """)
         
         st.subheader("Model Files")
