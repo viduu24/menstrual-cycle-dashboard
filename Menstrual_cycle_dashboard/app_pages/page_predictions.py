@@ -68,37 +68,89 @@ def show_predictions():
         st.header("Phase Prediction")
         st.markdown("Enter your values to predict the menstrual cycle phase.")
 
-        cycle_day = st.number_input("Cycle Day (1–28)", min_value=1, max_value=28, value=1)
-        estrogen = st.number_input("Estrogen (pg/mL)", value=0.0)
-        pdg = st.number_input("PDG (ng/mL)", value=0.0)
-        hr_mean = st.number_input("Mean Heart Rate (bpm)", value=60.0)
+        col1, col2 = st.columns(2)
+
+        with col1:
+            st.subheader("Cycle Info")
+            cycle_day = st.number_input("Cycle Day (1–28)", min_value=1, max_value=28, value=1)
+
+            st.subheader("Hormone Levels")
+            estrogen = st.number_input("Estrogen (pg/mL)", value=94.2, min_value=0.0)
+            pdg = st.number_input("PDG / Progesterone (ng/mL)", value=0.0, min_value=0.0)
+            lh = st.number_input("LH (mIU/mL)", value=2.9, min_value=0.0)
+
+            st.subheader("Heart Rate (from wearable)")
+            hr_mean = st.number_input("Average Heart Rate (bpm)", value=75.0)
+            hr_lag1 = st.number_input("Yesterday's Heart Rate (bpm)", value=75.0)
+            hr_rolling_7d = st.number_input("7-Day Average Heart Rate (bpm)", value=75.0)
+            hr_min = st.number_input("Min Heart Rate today (bpm)", value=60.0)
+            hr_max = st.number_input("Max Heart Rate today (bpm)", value=100.0)
+
+        with col2:
+            st.subheader("Symptoms")
+            options = ['Very Low/Little', 'Low', 'Moderate', 'High', 'Very High']
+            encode_map = {'Very Low/Little': 1, 'Low': 2, 'Moderate': 3, 'High': 4, 'Very High': 5}
+
+            cramps      = st.selectbox("Cramps", options)
+            fatigue     = st.selectbox("Fatigue", options)
+            bloating    = st.selectbox("Bloating", options)
+            moodswing   = st.selectbox("Mood Swings", options)
+            sorebreasts = st.selectbox("Sore Breasts", options)
 
         if st.button("Predict Phase"):
+            import numpy as np
 
+            # derived features
             normalized_cycle_day = (cycle_day - 1) / 27
+            cycle_week           = (cycle_day - 1) // 7 + 1
+            is_ovulation         = 1 if cycle_day == 14 else 0
+            hr_range             = hr_max - hr_min
+            estrogen_log         = np.log1p(estrogen)
+            pdg_log              = np.log1p(pdg)
+            lh_log               = np.log1p(lh)
+            estrogen_pdg_ratio   = estrogen / (pdg + 1e-5)
 
-            X = {}
-            for feat in m2_features:
-                if feat == "cycle_day":
-                    X[feat] = cycle_day
-                elif feat == "normalized_cycle_day":
-                    X[feat] = normalized_cycle_day
-                elif feat == "estrogen":
-                    X[feat] = estrogen
-                elif feat == "pdg":
-                    X[feat] = pdg
-                elif feat == "hr_mean":
-                    X[feat] = hr_mean
-                else:
-                    X[feat] = 0.0
+            cramps_enc      = encode_map[cramps]
+            fatigue_enc     = encode_map[fatigue]
+            bloating_enc    = encode_map[bloating]
+            moodswing_enc   = encode_map[moodswing]
+            sorebreasts_enc = encode_map[sorebreasts]
+            total_symptoms  = cramps_enc + fatigue_enc + bloating_enc + moodswing_enc + sorebreasts_enc
 
-            X = pd.DataFrame([X])
+            feature_values = {
+                'cycle_day':            cycle_day,
+                'normalized_cycle_day': normalized_cycle_day,
+                'cycle_week':           cycle_week,
+                'is_ovulation':         is_ovulation,
+                'estrogen':             estrogen,
+                'pdg':                  pdg,
+                'lh':                   lh,
+                'estrogen_log':         estrogen_log,
+                'pdg_log':              pdg_log,
+                'lh_log':               lh_log,
+                'estrogen_pdg_ratio':   estrogen_pdg_ratio,
+                'hr_mean':              hr_mean,
+                'hr_rolling_7d':        hr_rolling_7d,
+                'hr_lag1':              hr_lag1,
+                'hr_range':             hr_range,
+                'total_symptoms':       total_symptoms,
+                'cramps_encoded':       cramps_enc,
+                'fatigue_encoded':      fatigue_enc,
+                'bloating_encoded':     bloating_enc,
+                'moodswing_encoded':    moodswing_enc,
+                'sorebreasts_encoded':  sorebreasts_enc,
+            }
+
+            X = pd.DataFrame([{f: feature_values.get(f, 0.0) for f in m2_features}])
             X_scaled = m2_scaler.transform(X)
 
             pred_encoded = m2_model.predict(X_scaled)[0]
-            pred_phase = m2_encoder.inverse_transform([pred_encoded])[0]
+            pred_phase   = m2_encoder.inverse_transform([pred_encoded])[0]
 
             st.success(f"### Predicted Phase: **{pred_phase}**")
+
+            with st.expander("See input features used"):
+                st.dataframe(X)
 
     # =======================================================
     # MODEL 3 — CYCLE LENGTH PREDICTION
