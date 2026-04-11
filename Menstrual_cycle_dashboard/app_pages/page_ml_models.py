@@ -17,7 +17,7 @@ def show():
     # MODEL 1: PHASE PREDICTION
     # ====================================================================
     with tab1:
-        st.header("Model 2: Cycle Phase Prediction")
+        st.header("Model 1: Cycle Phase Prediction")
         
         col1, col2 = st.columns([2, 1])
         
@@ -90,7 +90,7 @@ def show():
     # MODEL 2: CYCLE LENGTH PREDICTION
     # ====================================================================
     with tab2:
-        st.header("Model 3: Cycle Length Prediction")
+        st.header("Model 2: Cycle Length Prediction")
         
         col1, col2 = st.columns([2, 1])
         
