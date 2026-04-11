@@ -44,27 +44,29 @@ Rate each symptom: **Cramps, Fatigue, Bloating, Mood Swings, Sore Breasts**
     with tab2:
         st.subheader("Recommended Input Ranges — Cycle Length Prediction")
         st.markdown("""
+> All inputs below are based on your **previous completed cycle**.
+
 ### Personal Info
 | Input | Range | Notes |
 |-------|-------|-------|
 | **Age** | 10–60 | Years |
 | **Height (cm)** | 100–220 | Used to auto-calculate BMI |
-| **Weight (lbs)** | 66–440 | Converted to kg automatically for BMI |
+| **Weight (lbs)** | 66–440 | Converted to kg automatically |
 | **BMI** | Auto-calculated | No need to enter manually |
 
-### Cycle Info
+### Previous Cycle Info
 | Input | Typical Range | Notes |
 |-------|---------------|-------|
-| **Estimated Day of Ovulation** | 11–17 | Usually around day 14 |
-| **Length of Luteal Phase (days)** | 10–16 | Time from ovulation to period |
-| **Length of Menses (days)** | 3–7 | How long your period lasts |
+| **Estimated Day of Ovulation** | 11–17 | When you ovulated last cycle — check with OPK strips or wearable |
+| **Length of Luteal Phase (days)** | 10–16 | Days from ovulation to start of next period |
+| **Length of Last Period (days)** | 3–7 | How many days your last period lasted |
 
 ### Bleeding Info
 | Input | Range | Notes |
 |-------|-------|-------|
-| **Mean Bleeding Intensity** | Very Light → Very Heavy | Overall average intensity |
-| **Total High Flow Days** | 0–10 | Days with heavy bleeding |
-| **Total Menses Score** | 0–30 | Sum of all daily scores |
+| **Mean Bleeding Intensity** | Very Light → Very Heavy | Overall average intensity of last period |
+| **Total High Flow Days** | 0–10 | Number of heavy bleeding days |
+| **Total Menses Score** | 0–30 | Sum of all 5 daily scores |
 
 ### Daily Menses Score
 | Score | Meaning |
@@ -76,7 +78,7 @@ Rate each symptom: **Cramps, Fatigue, Bloating, Mood Swings, Sore Breasts**
 | **4** | Heavy bleeding |
 | **5** | Very heavy bleeding |
 
-Enter a score for each of the **first 5 days** of your period.
+Enter a score for each of the **first 5 days** of your last period.
         """)
 
 def show():
