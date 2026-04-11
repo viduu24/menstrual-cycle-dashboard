@@ -469,7 +469,7 @@ From this line chart we can tell that the maximum bleeding is on day 2 of period
             st.subheader("Average Hormone Levels by Cycle Phase")
             
             # Map phase_encoded to phase names
-            phase_mapping = {0: 'Follicular', 1: 'Fertility', 2: 'Luteal', 3: 'Menstrual'}
+            phase_mapping = {1: 'Follicular', 2: 'Fertility', 3: 'Luteal', 4: 'Menstrual'}
             df_merged['phase_name'] = df_merged['phase_encoded'].map(phase_mapping)
             
             # Calculate averages
@@ -678,9 +678,12 @@ From this line chart we can tell that the maximum bleeding is on day 2 of period
 def decode_phase(phase_code):
     """Helper function to decode phase numbers to phase names"""
     phase_map = {
-        0: 'Follicular',
-        1: 'Fertility',
-        2: 'Luteal',
-        3: 'Menstrual'
+        1: 'Follicular',
+        2: 'Fertility',
+        3: 'Luteal',
+        4: 'Menstrual'
     }
-    return phase_map.get(phase_code, 'Unknown')
+    if pd.isna(phase_code):
+        return 'Unknown'
+    return phase_map.get(int(phase_code), 'Unknown')
+  
