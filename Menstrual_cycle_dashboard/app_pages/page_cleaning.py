@@ -279,8 +279,7 @@ df['LengthofLutealPhase'] = df[['LengthofLutealPhase', 'LengthofCycle']].min(axi
             
             st.markdown("---")
             st.info("""
-            **MNAR Detected:** Missing data is not random - when PDG (hormone) was measured,
-            symptoms were often not recorded. Missingness is related to testing method.
+            **MAR Detected** 
             """)
             
             st.markdown("### Pipeline Flow")
