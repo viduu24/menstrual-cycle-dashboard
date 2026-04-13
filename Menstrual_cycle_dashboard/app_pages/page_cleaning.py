@@ -357,8 +357,7 @@ df['headaches_encoded'] = df['headaches'].map(symptom_mapping)
             st.subheader("Step 2: Data Preparation")
             
             st.warning("""
-            **MNAR Observed:** Days when PDG was measured often lack symptom data.
-            Missingness is related to the hormone testing method.
+            **MAR Observed**
             """)
             
             st.markdown("### Preparation Steps")
