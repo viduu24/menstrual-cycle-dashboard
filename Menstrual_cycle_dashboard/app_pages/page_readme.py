@@ -8,7 +8,7 @@ def show():
     st.markdown("""
 <div style='text-align: justify;'>
 
-This project aims to guide users — from cleaning missing values, looking into some EDA done for the datasets, exploring insights through visualizations, and finally integrating ML for predicting cycle phase and cycle length . The dashboard integrates hormone data, symptom logs, heart-rate patterns, and cycle information to reveal how biological and lifestyle factors shape the menstrual cycle.
+This project aims to guide users regarding menstrual cycles. It includes information from cleaning missing values, looking into some EDA done for the datasets, exploring insights through visualizations, and finally integrating ML for predicting cycle phase and cycle length . The dashboard integrates hormone data, symptom logs, heart-rate patterns, and cycle information to reveal how biological and lifestyle factors shape the menstrual cycle.
 
 The goal is to make menstrual health more understandable for everyone, especially beginners, by highlighting meaningful trends, correlations, and phase-based patterns across the cycle.
 
